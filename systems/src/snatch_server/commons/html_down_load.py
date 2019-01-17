@@ -29,10 +29,16 @@ class HtmlDownLoad(object):
                     return resp
                 else:
                     # 调用函数将此proxy删除
-                    ProxyOperate().del_proxy(spider_name,proxy)
-                    count+=1
+                    count += 1
+                    try:
+                        ProxyOperate().del_proxy(spider_name,proxy)
+                    except:
+                        pass
             except:
-                count+=1
-                ProxyOperate().del_proxy(spider_name, proxy)
+                count += 1
+                try:
+                    ProxyOperate().del_proxy(spider_name, proxy)
+                except:
+                    pass
         return
 
