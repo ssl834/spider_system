@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>金采网-公告详情</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 引入 Bootstrap -->
+    <link href="/webPage/assets/css_plat/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="/webPage/assets/css_plat/font-awesome.min.css"/>
+    <link href="/webPage/assets/css_plat/cfcpn_CSS.css" rel="stylesheet"><!-- 金采网CSS样式 -->
+    <link rel="stylesheet" type="text/css" href="/webPage/assets/css_plat/detail_css/common.css">
+    <link rel="stylesheet" type="text/css" href="/webPage/assets/css_plat/detail_css/notice.css">
+    <link rel="stylesheet" type="text/css" href="/webPage/assets/css_plat/detail_css/list.css">
+    <link rel="stylesheet" type="text/css" href="/webPage/assets/css_plat/detail_css/table.css">
+    <!-- HTML5 Shim 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
+    <!-- 注意： 如果通过 file://  引入 Respond.js 文件，则该文件无法起效果 -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="/webPage/assets/js_plat/jquery-2.1.3.min.js"></script><!-- 轮播图 -->
+    <script type="text/javascript" src="/webPage/assets/js_plat/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/webPage/js/layer/layer.js"></script>
+    <script type="text/javascript" src="/webPage/js/tools/md5.js"></script>
+    <script>
+        /**
+         * 文件上传
+         * @param pidElemid
+         * @param textElemid
+         * @param supType
+         * @param sixStr
+         * @param filesize 文件大小
+         * @param idElemid
+         * @param fileNameId
+         * @param collectId 公告id
+         */
+        function uploadFile(pidElemid, textElemid, supType, sixStr, filesize, idElemid, fileNameId, collectId) {
+            var ck = getCookie("cfcpnKey");
+            var orgId = "";
+            if (ck == null || ck == '') {
+                alert("未登录，请前往首页登录或注册！");
+                window.location.href = "/";
+                return;
+            } else {
+                var json = eval("(" + ck + ")");
+                orgId = json.orgId;
+                if (orgId == null || orgId == '') {
+                    alert("未登录，请前往首页登录或注册！");
+                    window.location.href = "/";
+                    return;
+                }
+            }
+            $.ajax({
+                url: "/front/article/collect",// 跳转到 action
+                data: {"collId": collectId, "orgId": orgId},
+                type: 'post',
+                cache: false,
+                dataType: 'json',
+                success: function (data) {
+                    var isok = data.isok;
+                    var url = "/upload_sign_file?orgId=" + orgId + "&collectId=" + collectId + "&idElemid=" + idElemid + "&pidElemid=" + pidElemid +
+                        "&textElemid=" + textElemid +
+                        "&supType=" + supType +
+                        "&sixStr=" + sixStr +
+                        "&filesize=" + filesize +
+                        "&fileNameId=" + fileNameId +
+                        "&supId=" + data.supId;
+                    if (data.sign_require == undefined){
+                        data.sign_require = '';
+                    }
+                    url +=  "&sign_require=" + data.sign_require;
+                    if (isok == "T") {
+                        var data = data.data;
+                        layer.open({
+                            area: ['800px', '600px'],
+                            title: "上传报名文件",
+                            type: 2,
+                            content: encodeURI(url),
+                            resize: "true",
+                            yes: function () {
+                                layer.close();
+                            }
+                        });
+                    } else {
+                        layer.alert(data.msg);
+                    }
+
+                },
+                error: function () {
+                    alert("异常！");
+                }
+            });
+
+        }
+        $(function () {
+            var ck = getCookie("cfcpnKey");
+            var orgId = "";
+            if (ck == null || ck == '') {
+                return;
+            } else {
+                var json = eval("(" + ck + ")");
+                orgId = json.orgId;
+                if (orgId == null || orgId == '') {
+                    return;
+                }
+            }
+        });
+        //读Cookie，返回值为相应Cookie的内容
+        function getCookie(cookieName) {
+            var cookieContent = '';
+            var cookieAry = document.cookie.split("; ");//得到Cookie数组
+            for (var i = 0; i < cookieAry.length; i++) {
+                var temp = cookieAry[i].split("=");
+                if (temp[0] == cookieName) {
+                    cookieContent = unescape(temp[1]);
+                }
+            }
+            return cookieContent;
+        }
+    </script>
+</head>
+<body>
+
+<!-- 头部 -->
+<!-- 首页导航条 -->
+<!-- 引入 Bootstrap -->
+<link href="/webPage/assets/css_plat/bootstrap.css" rel="stylesheet">
+<link rel="stylesheet" href="/webPage/assets/css_plat/font-awesome.min.css"/>
+<link href="/webPage/assets/css_plat/cfcpn_CSS.css" rel="stylesheet"><!-- 金采网CSS样式 -->
+<script type="text/javascript" src="/webPage/assets/js_plat/jquery-2.1.3.min.js"></script><!-- 轮播图 -->
+<script type="text/javascript" src="/webPage/assets/js_plat/bootstrap.min.js"></script>
+<script>
+
+//    $(function () {
+//        var currUrl = window.location.pathname;
+//        console.log("url==>>" + currUrl);
+//        var ul = document.getElementById("ulnav")
+//        lilist = ul.getElementsByTagName("li")
+//        switch (currUrl) {
+//            case "/": {
+//                lilist[0].className = "cfcpn_nav_active";
+//            }
+//                break;
+//            case   "/service_bank": {
+//                lilist[1].className = "cfcpn_nav_active";
+//            }
+//                break
+//            case     "/service_supplier": {
+//                lilist[2].className = "cfcpn_nav_active";
+//            }
+//                break
+//            case     "/review": {
+//                lilist[3].className = "cfcpn_nav_active";
+//            }
+//                break
+//            case    "/program2017": {
+//                lilist[4].className = "cfcpn_nav_active";
+//            }
+//                break
+//            case     "/download_magazine": {
+//                lilist[5].className = "cfcpn_nav_active";
+//            }
+//                break
+//            case     "/about_us": {
+//                lilist[6].className = "cfcpn_nav_active";
+//            }
+//                break
+//            default: {
+//                lilist[0].className = "cfcpn_nav_active";
+//                return
+//            }
+//        }
+//    });
+
+
+</script>
+<!-- 首页导航条 -->
+<nav class="navbar navbar-default cfcpn_nav" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#cfcpn_navbar"
+                    aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar" style="color:#FFF;"></span>
+                <span class="icon-bar" style="color:#FFF;"></span>
+                <span class="icon-bar" style="color:#FFF;"></span>
+            </button>
+            <a href="/"><img src="/webPage/assets/images_plat/nav_logo.jpg" alt="logo"></a>
+        </div>
+
+        <!--向右对齐-->
+        <div class="collapse navbar-collapse" id="cfcpn_navbar">
+            <ul id="ulnav" class="nav navbar-nav navbar-right">
+                <li><a href="/">首页</a></li>
+                <li><a href="/service_bank">金融机构服务</a></li>
+                <li><a href="/service_supplier">供应商服务</a></li>
+                <li><a href="/review">活动回顾</a></li>
+                <li><a>活动报名</a></li>
+                <li><a href="/download_magazine">相关下载</a></li>
+                <li style="background:url(/webPage/assets/images_plat/hot005.gif) no-repeat 72px 5px"><a href="http://ec.cfcpn.com">金采e平台</a></li>
+                <li><a href="/about_us">关于我们</a></li>
+            </ul>
+        </div>
+
+    </div>
+</nav>
+<!-- 首页导航条End -->
+<!-- 头部End -->
+
+<div class="clearfix"></div>
+
+<!-- 欢迎注册 -->
+<script type="text/javascript" src="/webPage/js/tools/md5.js"></script>
+<script type="text/javascript">
+
+    window.onload = function () {
+        initUser();
+    }
+    function initUser() {
+        if ("/service_bank" === window.location.pathname) {
+            var a = document.getElementById("sub_title");
+            var b = document.getElementById("sub_title1");
+            a.style.visibility = "hidden";
+            b.style.visibility = "hidden";
+//           .visibility = "hidden";
+        }
+        var cfcpnKeyJson = getCookie("cfcpnKey");
+        if (cfcpnKeyJson != null && cfcpnKeyJson != "") {
+            var result = jQuery.parseJSON(cfcpnKeyJson);
+            var uname = result.userEname;
+            var pass = result.pwsd;
+            var validTime = result.validTime;
+            //校验时间
+            //starttime ='2012-12-25 20:17:24';
+            starttime = validTime.replace(new RegExp("-", "gm"), "/");
+            starttime = starttime.replace(new RegExp("@", "gm"), " ");
+            var endtimeHaoMiao = (new Date(starttime)).getTime(); //得到毫秒数
+            var curHaoMiao = new Date().getTime();
+            if ((endtimeHaoMiao - curHaoMiao) < 1200000) {
+                //授权验证
+                $.ajax({
+                    cache: true,
+                    type: "POST",
+                    url: '/cfcpnLogin/checkAuth',
+                    data: {userEname: uname, pwsd: pass, validTime: validTime},
+                    async: false,
+                    error: function (data) {
+                        //alert("连接服务器异常!");
+                    },
+                    success: function (resultJson) {
+                        if (resultJson.isok == 'T') {
+                            var lastr = JSON.stringify(resultJson); //将JSON对象转化为JSON字符
+                            document.cookie = "cfcpnKey=" + escape(lastr);//cookieName为要写入的Cookie的名称
+                            loginOk();
+                            $("#userCname").html(resultJson.userCname);
+                        } else {
+                            delCookie("cfcpnKey");
+                        }
+                    }
+                });
+            } else {
+                loginOk();
+                $("#userCname").html(result.userCname);
+            }
+        }
+    }
+    function sub() {
+        //$("#loginbtn").html("请等待...<img src='http://www.cfcpn.com:80//images/login/loading.gif'/> ");
+        $("#loginbtn").attr("disabled", "disabled");
+        var uname = $("#uname").val();
+        var pass = $("#upass").val();
+        pass = pass.md5();
+        //document.getElementById("loginForm").submit();
+        if (uname == "" || pass == "") {
+            alert("账号或密码不能为空!");
+            return false;
+        }
+        //登录
+        $.ajax({
+            cache: true,
+            type: "POST",
+            url: '/cfcpnLogin/login',
+            data: {userEname: uname, pwsd: pass, "ltype": "1"},
+            async: false,
+            error: function (data) {
+                alert("连接服务器异常!");
+            },
+            success: function (result) {
+                //alert(data);
+                //var result = jQuery.parseJSON(data);
+                if (result.isok == 'T') {
+                    var ename = result.userEname;
+                    var valDate = result.validTime;
+                    var pswd = result.pwsd;
+                    //写入cookie
+                    var lastr = JSON.stringify(result); //将JSON对象转化为JSON字符
+                    document.cookie = "cfcpnKey=" + escape(lastr);//cookieName为要写入的Cookie的名称
+                    //$("#loginNo").hide();
+                    //$("#loginOk").show();
+                    loginOk();//登录效果
+                    $("#userCname").html(result.userCname);
+                } else {
+                    delCookie("cfcpnKey");
+                    $("#loginbtn1").html("登 录");
+                    $('#loginbtn1').removeAttr("disabled");
+                    alert("登录失败,您的用户名或者密码错误!");
+                    getImage();
+                }
+            }
+        });
+    }
+    function logout() {
+        delCookie("cfcpnKey");
+        location.reload();
+    }
+    function delCookie(name) {//为了删除指定名称的cookie，可以将其过期时间设定为一个过去的时间
+        var date = new Date();
+        date.setTime(date.getTime() - 10000);
+        document.cookie = name + "=a; expires=" + date.toGMTString();
+    }
+    //读Cookie，返回值为相应Cookie的内容
+    function getCookie(cookieName) {
+        var cookieContent = '';
+        var cookieAry = document.cookie.split("; ");//得到Cookie数组
+        for (var i = 0; i < cookieAry.length; i++) {
+            var temp = cookieAry[i].split("=");
+            if (temp[0] == cookieName) {
+                cookieContent = unescape(temp[1]);
+            }
+        }
+        return cookieContent;
+    }
+    //进入后台
+    function toSup() {
+        var cfcpnKeyJson = getCookie("cfcpnKey");
+        if (cfcpnKeyJson != null && cfcpnKeyJson != "") {
+            var result = jQuery.parseJSON(cfcpnKeyJson);
+            var uname = result.userEname;
+            var pass = result.pwsd;
+            var pwd = result.pwd;
+            var userType = result.userType;
+            var go = result.go;
+            var supUrl = result.supUrl;
+            var validTime = result.validTime;
+            window.location.href = supUrl + "/loginSe.jsp?u=" + uname + "&p=" + pass + "&pwd=" + pwd + "&v=" + validTime + "&userType=" + userType + "&goUrl=" + go;
+
+        }
+    }
+
+
+    $(function () {
+        $("#showLogin").bind("keydown", function (e) {
+            // 兼容FF和IE和Opera
+            var theEvent = e || window.event;
+            var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
+            if (code == 13) {
+                //回车执行查询
+                $("#loginbtn1").click();
+            }
+        });
+    })
+
+</script>
+<script type="text/javascript">
+    var isLoginStatus = false;//全局变量判断登录状态
+    function loginOk() {
+        isLoginStatus = true;
+        $("#loginNo").animate({height: 'hide'});
+        $("#showLogin").animate({height: 'hide'});
+        setTimeout(function () {
+            $("#loginOk").animate({height: 'show'});
+        }, 600);
+    }
+    function logoutOk() {
+        $("#loginNo").animate({height: 'show'});
+        $("#loginOk").animate({height: 'hide'});
+    }
+
+    function showLogin() {
+        $("#loginNo").animate({height: 'hide'});
+        $("#showLogin").animate({height: 'show'});
+    }
+    function hideLogin() {
+        $("#loginNo").animate({height: 'show'});
+        $("#showLogin").animate({height: 'hide'});
+    }
+</script>
+<div class="cfcpn_register">
+    <div class="container">
+        <!-- 未登陆状态 -->
+        <div id="loginNo" class="row" style="display:block;">
+            <span id="sub_title" class="col-md-11 col-xs-12 ">您与金融客户只差一个“金采网+”</span>
+            <span class="col-md-1 col-xs-12 cfcpn_logged-in_bar">
+            <a href="/register">注册</a> |
+            <a href="javascript:void(0)" onclick="showLogin()">登录</a>
+          </span>
+        </div>
+        <!-- 未登陆状态End -->
+
+        <!-- 已登陆状态 -->
+        <div id="loginOk" class="row" style="display:none;">
+            <span id="sub_title1" class="col-md-8 col-xs-12 sub_title">您与金融客户只差一个“金采网+”</span>
+            <span class="col-md-4 cfcpn_logged-in_bar">
+                欢迎您，<a href="javascript:void(0)" onclick="toSup()"><span id="userCname"></span></a> &nbsp; |&nbsp;
+            <a href="javascript:void(0)" onclick="logout()">退出</a>
+          </span>
+        </div>
+        <!-- 已登陆状态End -->
+    </div>
+
+    <!-- 显示登录输入框 -->
+    <div id="showLogin" class="container" style="display:none;">
+        <div class="row">
+            <div class="col-md-4 col-sm-6 cfcpn_login_input">
+                <div class="input-group">
+                    <span class="input-group-addon glyphicon glyphicon-user" id="sizing-addon1"></span>
+                    <input id="uname" type="text" class="form-control" placeholder="用户名">
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-4 -->
+            <div class="col-md-4 col-sm-6 cfcpn_login_input">
+                <div class="input-group">
+                    <span class="input-group-addon glyphicon glyphicon-lock" id="sizing-addon2"></span>
+                    <input id="upass" type="password" class="form-control" placeholder="密码">
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-4 -->
+            <div class="col-md-4 col-sm-12 cfcpn_login_input">
+                <div class="input-group">
+                <span class="input-group-btn">
+                  <button id="loginbtn1" onclick="sub()" class="btn btn-primary cfcpn_login_btn"
+                          type="button">登录</button>
+                </span>
+                    <span class="cfcpn_login_register">
+                      <a href="javascript:void(0)" onclick="hideLogin()" style="color: #fd9f3e">取消</a>
+                    </span>
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-4 -->
+        </div><!-- /.row -->
+    </div>
+    <!-- 显示登录输入框End -->
+</div>
+
+<!-- 欢迎注册End -->
+
+<div class="clearfix"></div>
+
+<!-- 公告详情 -->
+<div class="container-fluid cfcpn_container_list-bg">
+
+    <div class="container">
+        <!-- 面包屑导航 -->
+        <span class="hidden-print">位置：</span>
+        <ol class="hidden-print breadcrumb cfcpn_news_breadcrumb">
+                        <li><a href="/">首页</a></li>
+            <li><a href=/plist/caigou>采供公告</a></li>
+            <li class="active">详情</li>
+        </ol>
+        <!-- 面包屑导航End -->
+
+        <div class="clearfix"></div>
+
+        <!-- 公告内容 -->
+        <div class="row">
+            <div class="col-lg-9 cfcpn_news_mian">
+
+
+                <div id="news_head">
+                    <p class="cfcpn_news_title">中国邮政储蓄银行重庆两江分行长寿区支行绿色植物摆租外包服务（第二次）</p>
+                    <p class="cfcpn_news_date">发布时间：2019-01-15 17:21:35</p>
+                    <div class="hidden-print cfcpn_news_step">
+                        <div class="col-lg-3 col-sm-3">
+                            <p class="glyphicon glyphicon-user cfcpn_news_step-icon"></p>
+                            <p style="margin-bottom:0px;">采购人</p>
+                            <p>中国邮政储蓄银行股份有限公司重庆两江分行</p>
+                        </div>
+                        <div class="col-lg-3 col-sm-3 col-xs-6">
+                            <p class="glyphicon glyphicon-shopping-cart cfcpn_news_step-icon"></p>
+                            <p style="margin-bottom:0px;">采购方式</p>
+                            <p>竞争性谈判</p>
+                        </div>
+                        <div class="col-lg-3 col-sm-3 col-xs-6">
+                            <p class="glyphicon glyphicon-map-marker cfcpn_news_step-icon"></p>
+                            <p style="margin-bottom:0px;">所在地区</p>
+                            <p>重庆市 长寿区 </p>
+                        </div>
+                        <div class="col-lg-3 col-sm-3 col-xs-6">
+                            <p class="glyphicon glyphicon-cutlery cfcpn_news_step-icon"></p>
+                            <p style="margin-bottom:0px;">品类</p>
+                            <p>服务 </p>
+                        </div>
+                    </div>
+                    <br>
+                    <p align="center">
+                                            </p>
+
+
+                </div>
+
+                <!--详细内容Startt-->
+                <div id="news_content">
+                    <p id="infoText" class=" text-left" style="line-height:200%;">
+
+                    <div class="notice">
+                        <div class="notice_describe">
+                            <b>
+                                <p style="margin-top:0;margin-right:0;margin-bottom:0;margin-left:0;text-indent:0;text-autospace:ideograph-numeric;text-align:center;line-height:33px"><span style="font-family: 仿宋_GB2312;font-size: 24px"><span style="font-family:仿宋_GB2312">采购邀请书</span></span></p><p style=";text-autospace:none;text-align:justify;text-justify:inter-ideograph;line-height:150%"><span style="font-family: 宋体;line-height: 150%;font-size: 20px">&nbsp;</span><strong><span style="font-family: 宋体;font-size: 19px">1. </span></strong><strong><span style="font-family: 宋体;font-size: 19px">采购</span></strong><strong><span style="font-family: 宋体;font-size: 19px">条件</span></strong></p><p style="text-indent:28px;line-height:37px"><span style=";font-family:宋体;font-size:19px">&nbsp;</span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">本</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">采购</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">项目</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">中国邮政储蓄银行重庆</span></span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">两江</span></span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">分行</span></span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">长寿区支行绿色植物租赁</span></span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">的采购项目已由中国邮政储蓄银行股份有限公司重庆</span></span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">两江</span></span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">分行批准实施。采</span></span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">购</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">人为</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">中国邮政储蓄银行重庆</span></span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">两江</span></span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">分行</span></span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">，</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">资金来自</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">自筹</span></span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">。项目已具备</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">采购</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">条件，现对该项目进行</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">竞争性谈判</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">，特邀请有兴趣的潜在</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">应答</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">人参与</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">应答</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">。</span></span></p><p style=";line-height:37px"><strong><span style="font-family: 宋体;font-size: 19px">　</span></strong><strong><span style="font-family: 宋体;font-size: 19px">&nbsp;2.</span></strong><strong><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">采购内容与项目金额</span></span></strong></p><p style="text-indent:37px;line-height:37px"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">采购内容为中国邮政储蓄银行重庆</span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">两江</span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">分行</span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">长寿区支行绿色植物租赁</span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">采购（第二次）</span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">，</span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">项目总金额不超过</span></span><span style="font-family: 宋体;font-size: 19px">4.2</span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">万元。</span></span></p><p style=";line-height:37px"><strong><span style="font-family: 宋体;font-size: 19px">&nbsp;&nbsp;&nbsp;3.应答人资格要求</span></strong></p><p style=";line-height:37px"><strong><span style="font-family: 宋体;font-size: 19px">&nbsp;&nbsp;</span></strong><span style="font-family: 宋体;font-size: 19px">&nbsp;3.1</span><span style="font-family: 宋体;font-size: 19px">&nbsp;&nbsp;</span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">有效营执照</span>:（提交营业执照复印件加盖投标人公章）；</span></p><p style=";line-height:37px"><span style="font-family: 宋体;font-size: 19px">&nbsp;&nbsp;</span><span style="font-family: 宋体;font-size: 19px">&nbsp;3.2</span><span style="font-family: 宋体;font-size: 19px">&nbsp;&nbsp;</span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">具有</span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">绿色植物租赁资质，能</span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">提供服务类增值税专用发票，增值税专用发票按符合行业法定要求的最高税率开具（提供相应证明文件复印件）；</span></span></p><p style=";line-height:37px"><span style="font-family: 宋体;font-size: 19px">&nbsp;&nbsp;&nbsp;3.3 &nbsp;2015年以来曾为金融机构或大型国企提供同类服务的案例业绩（提供合同复印件并加盖本单位公章）；</span></p><p style=";line-height:37px"><span style="font-family: 宋体;font-size: 19px">&nbsp;&nbsp;&nbsp;3.4</span><span style="font-family: 宋体;font-size: 19px">&nbsp;&nbsp;</span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">履约情况：近三年无因投标人违约或不恰当履约引起的合同中止、纠纷、争议、仲裁和诉讼败诉记录（提交声明文件原件，投标人自行出具）</span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">；</span></span></p><p style=";line-height:37px"><span style="font-family: 宋体;font-size: 19px">&nbsp;&nbsp;&nbsp;</span><span style="font-family: 宋体;font-size: 19px">3.</span><span style="font-family: 宋体;font-size: 19px">5 </span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">本次采购不接受联合体应答</span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">。</span></span></p><p style=";line-height:37px"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">　说明：</span></span></p><p style=";line-height:37px"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">　（</span>1）以上要求提供的所有资料复印件均需加盖投标单位鲜章。</span></p><p style=";line-height:37px"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">　（</span>2）招标人对投标人提供的相关资料保留进一步查证的权利，如发现所提供的资料有弄虚作假，招标人将取消其资格并保留追究其法律责任的权利；已签订合同的，解除合同并保留追究其法律责任的权利。</span></p><p style=";line-height:37px"><span style="font-family: 宋体;font-size: 19px">&nbsp;&nbsp;<span style="font-family:宋体">（</span></span><span style="font-family: 宋体;font-size: 19px">3</span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">）上述资格认定资料有一项未提供或不满足的做废标处理。</span></span></p><p style=";line-height:37px"><strong><span style="font-family: 宋体;font-size: 19px">4. </span></strong><strong><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">采购</span></span></strong><strong><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">文件的获取</span></span></strong></p><p style="text-indent:19px;vertical-align:baseline;line-height:37px"><span style=";font-family:宋体;font-size:19px">&nbsp;</span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">金采网自行下载</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">；（或提供营业执照副本、法定代表人授权委托书、被授权人身份证复印件、开户许可证，以上资料均需复印件加盖公章</span>,扫描件上传至邮箱530401068@qq.com，并电话确认项目联系人已收到。经项目联系人进行相关核实后，发放谈判价文件）。 </span></p><p style=";line-height:37px"><strong><span style="font-family: 宋体;font-size: 19px">5. </span></strong><strong><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">应答</span></span></strong><strong><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">文件的递交</span></span></strong></p><p style=";line-height:37px"><span style="font-family: 宋体;font-size: 19px">5.1递交时间： 201</span><span style="font-family: 宋体;font-size: 19px">9</span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">年</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px">&nbsp;</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px">1</span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">月</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px">&nbsp;</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px">24 </span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">日</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px">9</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px">:</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px">0</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px">0时。</span></span></p><p style="line-height: 37px"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">递交地址：中国邮政储蓄银行重庆</span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">两江</span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">分行（重庆市</span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">渝北区松牌路</span></span><span style="font-family: 宋体;font-size: 19px">145号风华美锦商务楼10楼会议室</span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">）开标室。</span></span></p><p style="line-height: 37px"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">开标时间：</span>201</span><span style="font-family: 宋体;font-size: 19px">9</span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">年</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px">&nbsp;</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px">1</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px">&nbsp;</span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">月</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px">&nbsp;</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px">24</span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">日</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px">9</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px">:</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px">3</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px">0时</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">（现场开标，请携带密封后的应答文件提前半小时到达开标现场）</span></span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">。</span></span></p><p style="line-height: 37px"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">开标地点：</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">中国邮政储蓄银行重庆</span></span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">两江</span></span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">分行</span></span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">（</span></span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">重庆市</span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">渝北区松牌路</span></span><span style="font-family: 宋体;font-size: 19px">145号风华美锦商务楼10楼会议室</span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">）</span></span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">开标室</span></span></span><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">。</span></span></p><p style="margin-right:4px;vertical-align:baseline;line-height:37px"><span style=";font-family:宋体;font-size:19px">5.2 逾期送达的或者未送达指定地点的</span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">应答</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">文件，</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">采购</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">人不予受理。</span></span></p><p style=";line-height:37px"><strong><span style="font-family: 宋体;font-size: 19px">6．发布公告的媒介</span></strong></p><p style="text-indent:37px;vertical-align:baseline;line-height:37px"><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">本次</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">采购</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">公告在</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">金采网</span></span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">上发布。</span></span></p><p style=";line-height:37px"><strong><span style="font-family: 宋体;font-size: 19px">7. 联系方式</span></strong></p><p style="line-height: 37px"><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">采购</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">人：中国邮政储蓄银行重庆</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">两江</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">分行</span></span><span style=";font-family:宋体;font-size:19px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></p><p style=";line-height:37px"><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">联系人：</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">向</span></span><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">老师</span></span><span style=";font-family:宋体;font-size:19px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></p><p style="line-height: 37px"><span style=";font-family:宋体;font-size:19px"><span style="font-family:宋体">电话：</span>023- </span><span style=";font-family:宋体;font-size:19px">67821152</span><span style=";font-family:宋体;font-size:19px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></p><p style="line-height: 37px"><span style=";font-family:宋体;font-size:19px">&nbsp;</span></p><p style="text-indent: 243px;line-height: 37px"><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px">201</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px">9</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">年</span> </span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px">1</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">月</span>15</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;font-size: 19px"><span style="font-family:宋体">日</span></span></span></p><p><br/></p>
+                            </b>
+                        </div>
+                        <div class="notice_message">
+                            <p>采购人：中国邮政储蓄银行股份有限公司重庆两江分行</p>
+                        </div>
+                    </div>
+
+
+
+
+                    </p>
+
+
+                </div>
+                <!--详细内容End-->
+
+
+            </div>
+
+            <!-- 侧边栏 -->
+            <div class="hidden-print col-lg-3 text-center cfcpn_news_sidebar">
+                <img src="/webPage/assets/images_plat/cont_ad02.jpg" class="img-responsive center-block">
+                <a href="#" target="_blank"><img src="/webPage/assets/images_plat/cont_ad03.jpg"
+                                                 class="img-responsive center-block" alt="广告位290*350"></a>
+                <a href="#" target="_blank"><img src="/webPage/assets/images_plat/cont_ad04.jpg"
+                                                 class="img-responsive center-block" alt="广告位290*350"></a>
+            </div>
+            <!-- 侧边栏End -->
+        </div>
+        <!-- 公告内容End -->
+
+    </div>
+
+</div>
+<!-- 公告详情End -->
+
+<div class="clearfix"></div>
+
+
+<!-- 页脚 -->
+<footer>
+    <div class="container-fluid text-center cfcpn_footer cfcpn_line_height100">
+        <p>Copyright©2008　中国金融集中采购网版权所有　京ICP备11024531号-1　京ICP证100491号</p>
+        <p>北京市西城区佟麟阁路95号尚信大厦12层</p>
+    </div>
+</footer>
+
+</body>
+</html>

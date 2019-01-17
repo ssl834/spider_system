@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>金采网-公告详情</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 引入 Bootstrap -->
+    <link href="/webPage/assets/css_plat/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="/webPage/assets/css_plat/font-awesome.min.css"/>
+    <link href="/webPage/assets/css_plat/cfcpn_CSS.css" rel="stylesheet"><!-- 金采网CSS样式 -->
+    <link rel="stylesheet" type="text/css" href="/webPage/assets/css_plat/detail_css/common.css">
+    <link rel="stylesheet" type="text/css" href="/webPage/assets/css_plat/detail_css/notice.css">
+    <link rel="stylesheet" type="text/css" href="/webPage/assets/css_plat/detail_css/list.css">
+    <link rel="stylesheet" type="text/css" href="/webPage/assets/css_plat/detail_css/table.css">
+    <!-- HTML5 Shim 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
+    <!-- 注意： 如果通过 file://  引入 Respond.js 文件，则该文件无法起效果 -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="/webPage/assets/js_plat/jquery-2.1.3.min.js"></script><!-- 轮播图 -->
+    <script type="text/javascript" src="/webPage/assets/js_plat/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/webPage/js/layer/layer.js"></script>
+    <script type="text/javascript" src="/webPage/js/tools/md5.js"></script>
+    <script>
+        /**
+         * 文件上传
+         * @param pidElemid
+         * @param textElemid
+         * @param supType
+         * @param sixStr
+         * @param filesize 文件大小
+         * @param idElemid
+         * @param fileNameId
+         * @param collectId 公告id
+         */
+        function uploadFile(pidElemid, textElemid, supType, sixStr, filesize, idElemid, fileNameId, collectId) {
+            var ck = getCookie("cfcpnKey");
+            var orgId = "";
+            if (ck == null || ck == '') {
+                alert("未登录，请前往首页登录或注册！");
+                window.location.href = "/";
+                return;
+            } else {
+                var json = eval("(" + ck + ")");
+                orgId = json.orgId;
+                if (orgId == null || orgId == '') {
+                    alert("未登录，请前往首页登录或注册！");
+                    window.location.href = "/";
+                    return;
+                }
+            }
+            $.ajax({
+                url: "/front/article/collect",// 跳转到 action
+                data: {"collId": collectId, "orgId": orgId},
+                type: 'post',
+                cache: false,
+                dataType: 'json',
+                success: function (data) {
+                    var isok = data.isok;
+                    var url = "/upload_sign_file?orgId=" + orgId + "&collectId=" + collectId + "&idElemid=" + idElemid + "&pidElemid=" + pidElemid +
+                        "&textElemid=" + textElemid +
+                        "&supType=" + supType +
+                        "&sixStr=" + sixStr +
+                        "&filesize=" + filesize +
+                        "&fileNameId=" + fileNameId +
+                        "&supId=" + data.supId;
+                    if (data.sign_require == undefined){
+                        data.sign_require = '';
+                    }
+                    url +=  "&sign_require=" + data.sign_require;
+                    if (isok == "T") {
+                        var data = data.data;
+                        layer.open({
+                            area: ['800px', '600px'],
+                            title: "上传报名文件",
+                            type: 2,
+                            content: encodeURI(url),
+                            resize: "true",
+                            yes: function () {
+                                layer.close();
+                            }
+                        });
+                    } else {
+                        layer.alert(data.msg);
+                    }
+
+                },
+                error: function () {
+                    alert("异常！");
+                }
+            });
+
+        }
+        $(function () {
+            var ck = getCookie("cfcpnKey");
+            var orgId = "";
+            if (ck == null || ck == '') {
+                return;
+            } else {
+                var json = eval("(" + ck + ")");
+                orgId = json.orgId;
+                if (orgId == null || orgId == '') {
+                    return;
+                }
+            }
+        });
+        //读Cookie，返回值为相应Cookie的内容
+        function getCookie(cookieName) {
+            var cookieContent = '';
+            var cookieAry = document.cookie.split("; ");//得到Cookie数组
+            for (var i = 0; i < cookieAry.length; i++) {
+                var temp = cookieAry[i].split("=");
+                if (temp[0] == cookieName) {
+                    cookieContent = unescape(temp[1]);
+                }
+            }
+            return cookieContent;
+        }
+    </script>
+</head>
+<body>
+
+<!-- 头部 -->
+<!-- 首页导航条 -->
+<!-- 引入 Bootstrap -->
+<link href="/webPage/assets/css_plat/bootstrap.css" rel="stylesheet">
+<link rel="stylesheet" href="/webPage/assets/css_plat/font-awesome.min.css"/>
+<link href="/webPage/assets/css_plat/cfcpn_CSS.css" rel="stylesheet"><!-- 金采网CSS样式 -->
+<script type="text/javascript" src="/webPage/assets/js_plat/jquery-2.1.3.min.js"></script><!-- 轮播图 -->
+<script type="text/javascript" src="/webPage/assets/js_plat/bootstrap.min.js"></script>
+<script>
+
+//    $(function () {
+//        var currUrl = window.location.pathname;
+//        console.log("url==>>" + currUrl);
+//        var ul = document.getElementById("ulnav")
+//        lilist = ul.getElementsByTagName("li")
+//        switch (currUrl) {
+//            case "/": {
+//                lilist[0].className = "cfcpn_nav_active";
+//            }
+//                break;
+//            case   "/service_bank": {
+//                lilist[1].className = "cfcpn_nav_active";
+//            }
+//                break
+//            case     "/service_supplier": {
+//                lilist[2].className = "cfcpn_nav_active";
+//            }
+//                break
+//            case     "/review": {
+//                lilist[3].className = "cfcpn_nav_active";
+//            }
+//                break
+//            case    "/program2017": {
+//                lilist[4].className = "cfcpn_nav_active";
+//            }
+//                break
+//            case     "/download_magazine": {
+//                lilist[5].className = "cfcpn_nav_active";
+//            }
+//                break
+//            case     "/about_us": {
+//                lilist[6].className = "cfcpn_nav_active";
+//            }
+//                break
+//            default: {
+//                lilist[0].className = "cfcpn_nav_active";
+//                return
+//            }
+//        }
+//    });
+
+
+</script>
+<!-- 首页导航条 -->
+<nav class="navbar navbar-default cfcpn_nav" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#cfcpn_navbar"
+                    aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar" style="color:#FFF;"></span>
+                <span class="icon-bar" style="color:#FFF;"></span>
+                <span class="icon-bar" style="color:#FFF;"></span>
+            </button>
+            <a href="/"><img src="/webPage/assets/images_plat/nav_logo.jpg" alt="logo"></a>
+        </div>
+
+        <!--向右对齐-->
+        <div class="collapse navbar-collapse" id="cfcpn_navbar">
+            <ul id="ulnav" class="nav navbar-nav navbar-right">
+                <li><a href="/">首页</a></li>
+                <li><a href="/service_bank">金融机构服务</a></li>
+                <li><a href="/service_supplier">供应商服务</a></li>
+                <li><a href="/review">活动回顾</a></li>
+                <li><a>活动报名</a></li>
+                <li><a href="/download_magazine">相关下载</a></li>
+                <li style="background:url(/webPage/assets/images_plat/hot005.gif) no-repeat 72px 5px"><a href="http://ec.cfcpn.com">金采e平台</a></li>
+                <li><a href="/about_us">关于我们</a></li>
+            </ul>
+        </div>
+
+    </div>
+</nav>
+<!-- 首页导航条End -->
+<!-- 头部End -->
+
+<div class="clearfix"></div>
+
+<!-- 欢迎注册 -->
+<script type="text/javascript" src="/webPage/js/tools/md5.js"></script>
+<script type="text/javascript">
+
+    window.onload = function () {
+        initUser();
+    }
+    function initUser() {
+        if ("/service_bank" === window.location.pathname) {
+            var a = document.getElementById("sub_title");
+            var b = document.getElementById("sub_title1");
+            a.style.visibility = "hidden";
+            b.style.visibility = "hidden";
+//           .visibility = "hidden";
+        }
+        var cfcpnKeyJson = getCookie("cfcpnKey");
+        if (cfcpnKeyJson != null && cfcpnKeyJson != "") {
+            var result = jQuery.parseJSON(cfcpnKeyJson);
+            var uname = result.userEname;
+            var pass = result.pwsd;
+            var validTime = result.validTime;
+            //校验时间
+            //starttime ='2012-12-25 20:17:24';
+            starttime = validTime.replace(new RegExp("-", "gm"), "/");
+            starttime = starttime.replace(new RegExp("@", "gm"), " ");
+            var endtimeHaoMiao = (new Date(starttime)).getTime(); //得到毫秒数
+            var curHaoMiao = new Date().getTime();
+            if ((endtimeHaoMiao - curHaoMiao) < 1200000) {
+                //授权验证
+                $.ajax({
+                    cache: true,
+                    type: "POST",
+                    url: '/cfcpnLogin/checkAuth',
+                    data: {userEname: uname, pwsd: pass, validTime: validTime},
+                    async: false,
+                    error: function (data) {
+                        //alert("连接服务器异常!");
+                    },
+                    success: function (resultJson) {
+                        if (resultJson.isok == 'T') {
+                            var lastr = JSON.stringify(resultJson); //将JSON对象转化为JSON字符
+                            document.cookie = "cfcpnKey=" + escape(lastr);//cookieName为要写入的Cookie的名称
+                            loginOk();
+                            $("#userCname").html(resultJson.userCname);
+                        } else {
+                            delCookie("cfcpnKey");
+                        }
+                    }
+                });
+            } else {
+                loginOk();
+                $("#userCname").html(result.userCname);
+            }
+        }
+    }
+    function sub() {
+        //$("#loginbtn").html("请等待...<img src='http://www.cfcpn.com:80//images/login/loading.gif'/> ");
+        $("#loginbtn").attr("disabled", "disabled");
+        var uname = $("#uname").val();
+        var pass = $("#upass").val();
+        pass = pass.md5();
+        //document.getElementById("loginForm").submit();
+        if (uname == "" || pass == "") {
+            alert("账号或密码不能为空!");
+            return false;
+        }
+        //登录
+        $.ajax({
+            cache: true,
+            type: "POST",
+            url: '/cfcpnLogin/login',
+            data: {userEname: uname, pwsd: pass, "ltype": "1"},
+            async: false,
+            error: function (data) {
+                alert("连接服务器异常!");
+            },
+            success: function (result) {
+                //alert(data);
+                //var result = jQuery.parseJSON(data);
+                if (result.isok == 'T') {
+                    var ename = result.userEname;
+                    var valDate = result.validTime;
+                    var pswd = result.pwsd;
+                    //写入cookie
+                    var lastr = JSON.stringify(result); //将JSON对象转化为JSON字符
+                    document.cookie = "cfcpnKey=" + escape(lastr);//cookieName为要写入的Cookie的名称
+                    //$("#loginNo").hide();
+                    //$("#loginOk").show();
+                    loginOk();//登录效果
+                    $("#userCname").html(result.userCname);
+                } else {
+                    delCookie("cfcpnKey");
+                    $("#loginbtn1").html("登 录");
+                    $('#loginbtn1').removeAttr("disabled");
+                    alert("登录失败,您的用户名或者密码错误!");
+                    getImage();
+                }
+            }
+        });
+    }
+    function logout() {
+        delCookie("cfcpnKey");
+        location.reload();
+    }
+    function delCookie(name) {//为了删除指定名称的cookie，可以将其过期时间设定为一个过去的时间
+        var date = new Date();
+        date.setTime(date.getTime() - 10000);
+        document.cookie = name + "=a; expires=" + date.toGMTString();
+    }
+    //读Cookie，返回值为相应Cookie的内容
+    function getCookie(cookieName) {
+        var cookieContent = '';
+        var cookieAry = document.cookie.split("; ");//得到Cookie数组
+        for (var i = 0; i < cookieAry.length; i++) {
+            var temp = cookieAry[i].split("=");
+            if (temp[0] == cookieName) {
+                cookieContent = unescape(temp[1]);
+            }
+        }
+        return cookieContent;
+    }
+    //进入后台
+    function toSup() {
+        var cfcpnKeyJson = getCookie("cfcpnKey");
+        if (cfcpnKeyJson != null && cfcpnKeyJson != "") {
+            var result = jQuery.parseJSON(cfcpnKeyJson);
+            var uname = result.userEname;
+            var pass = result.pwsd;
+            var pwd = result.pwd;
+            var userType = result.userType;
+            var go = result.go;
+            var supUrl = result.supUrl;
+            var validTime = result.validTime;
+            window.location.href = supUrl + "/loginSe.jsp?u=" + uname + "&p=" + pass + "&pwd=" + pwd + "&v=" + validTime + "&userType=" + userType + "&goUrl=" + go;
+
+        }
+    }
+
+
+    $(function () {
+        $("#showLogin").bind("keydown", function (e) {
+            // 兼容FF和IE和Opera
+            var theEvent = e || window.event;
+            var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
+            if (code == 13) {
+                //回车执行查询
+                $("#loginbtn1").click();
+            }
+        });
+    })
+
+</script>
+<script type="text/javascript">
+    var isLoginStatus = false;//全局变量判断登录状态
+    function loginOk() {
+        isLoginStatus = true;
+        $("#loginNo").animate({height: 'hide'});
+        $("#showLogin").animate({height: 'hide'});
+        setTimeout(function () {
+            $("#loginOk").animate({height: 'show'});
+        }, 600);
+    }
+    function logoutOk() {
+        $("#loginNo").animate({height: 'show'});
+        $("#loginOk").animate({height: 'hide'});
+    }
+
+    function showLogin() {
+        $("#loginNo").animate({height: 'hide'});
+        $("#showLogin").animate({height: 'show'});
+    }
+    function hideLogin() {
+        $("#loginNo").animate({height: 'show'});
+        $("#showLogin").animate({height: 'hide'});
+    }
+</script>
+<div class="cfcpn_register">
+    <div class="container">
+        <!-- 未登陆状态 -->
+        <div id="loginNo" class="row" style="display:block;">
+            <span id="sub_title" class="col-md-11 col-xs-12 ">您与金融客户只差一个“金采网+”</span>
+            <span class="col-md-1 col-xs-12 cfcpn_logged-in_bar">
+            <a href="/register">注册</a> |
+            <a href="javascript:void(0)" onclick="showLogin()">登录</a>
+          </span>
+        </div>
+        <!-- 未登陆状态End -->
+
+        <!-- 已登陆状态 -->
+        <div id="loginOk" class="row" style="display:none;">
+            <span id="sub_title1" class="col-md-8 col-xs-12 sub_title">您与金融客户只差一个“金采网+”</span>
+            <span class="col-md-4 cfcpn_logged-in_bar">
+                欢迎您，<a href="javascript:void(0)" onclick="toSup()"><span id="userCname"></span></a> &nbsp; |&nbsp;
+            <a href="javascript:void(0)" onclick="logout()">退出</a>
+          </span>
+        </div>
+        <!-- 已登陆状态End -->
+    </div>
+
+    <!-- 显示登录输入框 -->
+    <div id="showLogin" class="container" style="display:none;">
+        <div class="row">
+            <div class="col-md-4 col-sm-6 cfcpn_login_input">
+                <div class="input-group">
+                    <span class="input-group-addon glyphicon glyphicon-user" id="sizing-addon1"></span>
+                    <input id="uname" type="text" class="form-control" placeholder="用户名">
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-4 -->
+            <div class="col-md-4 col-sm-6 cfcpn_login_input">
+                <div class="input-group">
+                    <span class="input-group-addon glyphicon glyphicon-lock" id="sizing-addon2"></span>
+                    <input id="upass" type="password" class="form-control" placeholder="密码">
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-4 -->
+            <div class="col-md-4 col-sm-12 cfcpn_login_input">
+                <div class="input-group">
+                <span class="input-group-btn">
+                  <button id="loginbtn1" onclick="sub()" class="btn btn-primary cfcpn_login_btn"
+                          type="button">登录</button>
+                </span>
+                    <span class="cfcpn_login_register">
+                      <a href="javascript:void(0)" onclick="hideLogin()" style="color: #fd9f3e">取消</a>
+                    </span>
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-4 -->
+        </div><!-- /.row -->
+    </div>
+    <!-- 显示登录输入框End -->
+</div>
+
+<!-- 欢迎注册End -->
+
+<div class="clearfix"></div>
+
+<!-- 公告详情 -->
+<div class="container-fluid cfcpn_container_list-bg">
+
+    <div class="container">
+        <!-- 面包屑导航 -->
+        <span class="hidden-print">位置：</span>
+        <ol class="hidden-print breadcrumb cfcpn_news_breadcrumb">
+                        <li><a href="/">首页</a></li>
+            <li><a href=/plist/caigou>采供公告</a></li>
+            <li class="active">详情</li>
+        </ol>
+        <!-- 面包屑导航End -->
+
+        <div class="clearfix"></div>
+
+        <!-- 公告内容 -->
+        <div class="row">
+            <div class="col-lg-9 cfcpn_news_mian">
+
+
+                <div id="news_head">
+                    <p class="cfcpn_news_title">恒丰银行积分兑换平台（积分+现金支付）项目POC测试供应商征集</p>
+                    <p class="cfcpn_news_date">发布时间：2019-01-15 17:03:24</p>
+                    <div class="hidden-print cfcpn_news_step">
+                        <div class="col-lg-3 col-sm-3">
+                            <p class="glyphicon glyphicon-user cfcpn_news_step-icon"></p>
+                            <p style="margin-bottom:0px;">采购人</p>
+                            <p>恒丰银行</p>
+                        </div>
+                        <div class="col-lg-3 col-sm-3 col-xs-6">
+                            <p class="glyphicon glyphicon-shopping-cart cfcpn_news_step-icon"></p>
+                            <p style="margin-bottom:0px;">采购方式</p>
+                            <p>公开招标</p>
+                        </div>
+                        <div class="col-lg-3 col-sm-3 col-xs-6">
+                            <p class="glyphicon glyphicon-map-marker cfcpn_news_step-icon"></p>
+                            <p style="margin-bottom:0px;">所在地区</p>
+                            <p>山东省 烟台市 </p>
+                        </div>
+                        <div class="col-lg-3 col-sm-3 col-xs-6">
+                            <p class="glyphicon glyphicon-cutlery cfcpn_news_step-icon"></p>
+                            <p style="margin-bottom:0px;">品类</p>
+                            <p>服务 软件系统开发设计 </p>
+                        </div>
+                    </div>
+                    <br>
+                    <p align="center">
+                                            </p>
+
+
+                </div>
+
+                <!--详细内容Startt-->
+                <div id="news_content">
+                    <p id="infoText" class=" text-left" style="line-height:200%;">
+
+                    <div class="notice">
+                        <div class="notice_describe">
+                            <b>
+                                <p style=";text-align:center;line-height:150%"><span style=";font-family:宋体;line-height:150%;letter-spacing:-1px;font-size:19px"><span style="font-family:宋体">恒丰银行积分兑换平台（积分</span>+现金支付）项目POC测试供应商征集</span><span style=";font-family:宋体;line-height:150%;font-size:19px"><span style="font-family:宋体">公告</span></span></p><p style="text-indent: 32px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">一、采</span> <span style="font-family:宋体">购</span> <span style="font-family:宋体">人：</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">恒丰银行股份有限公司</span></span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px">&nbsp;</span></span><span style=";font-family:宋体;line-height:150%;font-size:16px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-family:宋体">地</span> &nbsp;<span style="font-family:宋体">址：</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">山东省烟台市芝罘区通姜路东首</span></span></span></p><p style="text-indent: 48px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">&nbsp;&nbsp;</span><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">联系方式：</span>0535-3026099 &nbsp;</span></p><p style="text-indent: 32px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-family:宋体">采购代理机构：</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">山东信一项目管理有限公司</span></span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px">&nbsp;</span></span><span style=";font-family:宋体;line-height:150%;font-size:16px">&nbsp;&nbsp;&nbsp;<span style="font-family:宋体">地</span> &nbsp;<span style="font-family:宋体">址：</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">烟台市莱山区山海路</span>117号内7号烟台咨询大厦12楼</span></span></p><p style="text-indent: 48px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">&nbsp;&nbsp;</span><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">联系方式：</span></span><span style=";font-family:宋体;line-height:150%;font-size:16px">0535-211195</span><span style=";font-family:宋体;line-height:150%;font-size:16px">6</span></p><p style="text-indent: 32px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">二、采购项目名称：恒丰银行积分兑换平台（积分</span>+现金支付）项目POC测试供应商征集</span></p><p style="text-indent: 32px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-family:宋体">采购项目编号：</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px">&nbsp;</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px">/</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span></p><p style="text-indent: 32px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-family:宋体">采购项目分包情况：</span></span></p><table cellspacing="0" width="869" style="width: 552px;"><tbody><tr style="height:27px" class="firstRow"><td width="55" valign="center" style="padding: 0px 7px; border-width: 1px; border-color: windowtext;"><p style=";text-align:center;line-height:150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">标包</span></p></td><td width="90" valign="center" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: windowtext; border-top-width: 1px; border-top-color: windowtext; border-bottom-width: 1px; border-bottom-color: windowtext;"><p style=";text-align:center;line-height:150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">采购</span></p><p style=";text-align:center;line-height:150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">内容</span></p></td><td width="58" valign="center" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: windowtext; border-top-width: 1px; border-top-color: windowtext; border-bottom-width: 1px; border-bottom-color: windowtext;"><p style=";text-align:center;line-height:150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">数量</span></p></td><td width="667" valign="center" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: windowtext; border-top-width: 1px; border-top-color: windowtext; border-bottom-width: 1px; border-bottom-color: windowtext;"><p style=";text-align:center;line-height:150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">供应商资格要求</span></p></td></tr><tr style="height:63px"><td width="55" valign="center" style="padding: 0px 7px; border-left-width: 1px; border-left-color: windowtext; border-right-width: 1px; border-right-color: windowtext; border-top: none; border-bottom-width: 1px; border-bottom-color: windowtext;"><p style=";text-align:center;line-height:150%"><span style="font-family:宋体;line-height:150%;font-size:16px">1</span></p></td><td width="90" valign="center" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: windowtext; border-top: none; border-bottom-width: 1px; border-bottom-color: windowtext;"><p style="text-align:center;line-height:150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">恒丰银行积分兑换平台（积分+现金支付）项目POC测试供应商征集</span></p></td><td width="58" valign="center" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: windowtext; border-top: none; border-bottom-width: 1px; border-bottom-color: windowtext;"><p style=";text-align:center;line-height:150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">1宗</span></p></td><td width="667" valign="top" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: windowtext; border-top: none; border-bottom-width: 1px; border-bottom-color: windowtext;"><p style="line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">1、供应商应当具有独立法人资格，企业注册资本金不少于人民币1000万元（含）。</span></p><p style="line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">2、供应商须具有CMMI三级及以上认证或者ISO9001认证。</span></p><p style="line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">3、供应商须具有信息系统集成及服务三级及以上认证。</span></p><p style="line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">4、供应商三年内须具有全国性国有银行或者全国性股份制银行成功实施案例至少一例，</span><span style=";font-family:宋体;line-height:150%;font-size:16px">其中银行指的是五大行（中国银行、中国农业银行、中国建设银行、中国工商银行、交通银行）或者十二家全国股份制银行（招商银行、浦发银行、中信银行、华夏银行、光大银行、民生银行、兴业银行、广发银行、平安银行、浙商银行、渤海银行、恒丰银行）或者中国邮政储蓄银行或者三大政策性银行（国家开发银行、中国进出口银行、中国农业发展银行）</span><span style="font-family:宋体;line-height:150%;font-size:16px">。</span></p><p style="line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">5、供应商在相关领域有强大的产品实施、渠道资源、技术支持和系统实施集成能力，可提供关 于实施方案的应用策略、项目实施管理模式以及运行维护管理的培训和相关书面资料，可提供产品及解决方案的安装、配置、调试、及现场或非现场技术支持服务、及相关书面资料。</span></p><p style="line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">6、供应商必须是最终系统的直接开发公司。</span></p><p style="line-height: 150%"><span style="font-family:宋体;line-height:150%;font-size:16px">7</span><span style=";font-family:宋体;line-height:150%;font-size:16px">、供应商需要有独立的UI/UE设计团队。</span><span style="font-family:宋体;line-height:150%;font-size:16px"><br/></span><span style="font-family:宋体;line-height:150%;font-size:16px">8</span><span style=";font-family:宋体;line-height:150%;font-size:16px">、本项目不允许联合体</span><span style=";font-family:宋体;line-height:150%;font-size:16px">参与POC测试</span><span style=";font-family:宋体;line-height:150%;font-size:16px">。 </span></p></td></tr></tbody></table><p style="text-indent: 32px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">三、项目背景、</span></span><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">需求范围</span></span><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">及技术要求</span></span></p><p style="margin-left:0;text-indent:32px"><span style="font-family:宋体;font-size:16px">1．</span><span style=";font-family:宋体;font-size:16px"><span style="font-family:宋体">项目背景：</span></span></p><p style="margin-left: 32px;text-indent: 32px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">积分回馈是信用卡产品运营的基础核心之一，也是受客户关注的增值权益，积分业务经营的主要目标是在信用卡金融服务功能的基础上，为持卡客户提供额外的积分权益，通过积分兑换等增值内容提升持卡人对于信用卡的认可与喜爱，进而促进客户的用卡意愿及粘性，提升信用卡的活跃度和刷卡消费等综合表现</span></span><span style=";font-family:仿宋_GB2312;line-height:150%;font-size:16px"><span style="font-family:仿宋_GB2312">。</span></span></p><p style="margin-left: 32px;text-indent: 32px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">根据信用卡积分业务发展需要，在</span>2017年恒丰银行筹备开展了信用卡积分兑换平台，该平台主要应用于信用卡积分兑换、积分营销活动等场景，旨在为客户提供丰富的积分增值权益和积分使用场景。</span></p><p style="margin-left: 32px;text-indent: 32px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">基于此，计划在</span>2019年持续对平台进行二次开发及改造工作，主要包括对现有功能、界面的细化和优化，以及新增积分加现金组合兑换支付模式，进一步提升积分兑换平台的功能完整性，提升客户的使用体验。本需求主要对积分+现金组合支付这个新增功能进行说明，其他现有功能优化等将另行提交需求，分批次完成。</span></p><p style="margin-left:0;text-indent:32px"><span style="font-family:宋体;font-size:16px">2．</span><span style=";font-family:宋体;font-size:16px"><span style="font-family:宋体">需求范围</span></span></p><p style="margin-left: 32px;text-indent: 32px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">恒丰银行积分兑换平台</span>2017年已实现了商品管理、商户管理、商品兑换、订单查询等基本业务流程内容，实现全积分兑换。为拓展积分商品的兑换率和使用场景，基于现有积分兑换平台新增积分加现金组合支付的兑换模式，本期项目为提升用户体验，丰富客户支付方式，主要围绕PC及移动端UI改造、积分+现金支付管理、营销活动定制UI、营销活动及系统现有功能优化更新。</span></p><p style="margin-left:0;text-indent:32px"><span style="font-family:Cambria;font-size:16px">3．</span><span style=";font-family:宋体;font-size:16px"><span style="font-family:宋体">技术要求</span></span></p><p style="margin-left:56px"><span style="font-family:Cambria;font-size:16px">1)&nbsp;</span><span style=";font-family:宋体;font-size:16px"><span style="font-family:宋体">安全要求。</span></span><span style=";font-family:宋体;font-size:16px"><span style="font-family:宋体">支持数据变形及脱敏机制，可实现对数据的安全存储及访问。系统符合国家相关安全标准，审计时不出现应用层面的漏洞；</span></span></p><p style="margin-left:56px"><span style="font-family:Cambria;font-size:16px">2)&nbsp;</span><span style=";font-family:宋体;font-size:16px"><span style="font-family:宋体">系统稳定性要求</span></span><span style=";font-family:宋体;font-size:16px"><span style="font-family:宋体">。</span></span><span style=";font-family:宋体;font-size:16px"><span style="font-family:宋体">系统须保证</span>7*24<span style="font-family:宋体">小时正常运行，系统日常的优化及变更不得停止正常业务处理</span></span><span style=";font-family:宋体;font-size:16px"><span style="font-family:宋体">；</span></span></p><p style="margin-left:56px"><span style="font-family:Cambria;font-size:16px">3)&nbsp;</span><span style=";font-family:宋体;font-size:16px"><span style="font-family:宋体">系统性能要求</span></span><span style=";font-family:宋体;font-size:16px"><span style="font-family:宋体">。支持并发用户数量要能够满足访问需求，不少于</span>100<span style="font-family:宋体">万人同时在线使用，超过</span><span style="font-family:Cambria">100</span><span style="font-family:宋体">万人同时在线使用时应有相关机制控制不影响原有作业的处理，对于访问超时需有自动链接释放机制，针对未来变化系统可支持横向扩容；</span></span></p><p style="margin-left:56px"><span style="font-family:Cambria;font-size:16px">4)&nbsp;</span><span style=";font-family:宋体;font-size:16px"><span style="font-family:宋体">专业</span>UI<span style="font-family:宋体">及</span><span style="font-family:Cambria">UE</span><span style="font-family:宋体">设计团队。</span></span></p><p style="text-indent: 32px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">四、议程安排：</span></span></p><p style="margin-left: 0;text-indent: 32px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">1.报名参与时间</span><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">：</span></span><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">自</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px">2019</span></span><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">年</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px">1</span></span><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">月</span></span><span style="font-family: 宋体;line-height: 150%;font-size: 16px">16</span><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">日</span></span><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">起至</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px">2019</span></span><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">年</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px">1</span></span><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">月</span></span><span style="font-family: 宋体;line-height: 150%;font-size: 16px">29</span><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">日</span></span><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">止，上午</span>8:30－11:30，</span><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">下午</span>14:00－17:00 （北京时间，法定公休日、法定节假日除外）</span></p><p style="text-indent: 32px;line-height: 150%"><span style="font-family: 宋体;line-height: 150%;font-size: 16px">2.报名地点：</span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">山东信一项目管理有限公司（烟台市莱山区山海路</span>117号内7号烟台咨询大厦12楼1204业务窗口）</span></span><span style="font-family: 宋体;line-height: 150%;font-size: 16px">&nbsp;</span></p><p style="text-indent: 32px;line-height: 150%"><span style="font-family: 宋体;line-height: 150%;font-size: 16px">3.报名电话：</span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px">0536-2111952</span></span></p><p style="text-indent:32px;line-height:150%"><span style="font-family: 宋体;line-height: 150%;font-size: 16px">4.是否接受测试反馈时限：</span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px">2019年1月</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px">29</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">日</span></span></span><span style="font-family: 宋体;line-height: 150%;font-size: 16px">17：</span><span style="font-family: 宋体;line-height: 150%;font-size: 16px">3</span><span style="font-family: 宋体;line-height: 150%;font-size: 16px">0时（北京时间）前将邀请函加盖公章扫描后回传至山东信一项目管理有限公司邮箱（邮箱：sdxyzhaobiao@163.com），逾期未发送的供应商视为自动放弃（以收件时间为准）。</span><strong><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">所有</span></span></strong><strong><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">报名</span></span></strong><strong><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">供应商</span></span></strong><strong><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">必须参加</span></span></strong><strong><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">招标人</span>POC测试</span></strong><strong><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">，</span></span></strong><strong><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">未</span></span></strong><strong><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">参加</span></span></strong><strong><span style="font-family: 宋体;line-height: 150%;font-size: 16px">POC测试</span></strong><strong><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">的</span></span></strong><strong><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">供应商将</span></span></strong><strong><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">不能参加</span></span></strong><strong><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">本项目</span></span></strong><strong><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">的后续</span></span></strong><strong><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">投标环节</span></span></strong><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">。</span></span></p><p style="text-indent:32px;line-height:150%"><span style="font-family: 宋体;line-height: 150%;font-size: 16px">5.测试地点：</span><strong><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">上海开平路</span>88号瀛通绿地大厦</span></strong><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">。</span></span></p><p style="text-indent:32px;line-height:150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">6.本项目POC测试共2轮，第一轮由厂商搭建POC环境，测试小组验证各项功能及系统性能；第二轮，厂商现场讲解方案，根据POC的部署产品展示系统相关功能。</span></p><p style="text-indent: 32px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">五、有关说明：</span></span></p><p style="text-indent:32px;line-height:150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">1．</span><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">采购人不统一组织供应商对现场进行勘察。</span></span><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">无论供应商对现场考察与否，都将被视为熟悉履行合同有关的一切情况，并承担一切与磋商有关的风险、责任和义务，勘察现场所发生的一切费用由供应商自行承担。</span> </span></p><p style="text-indent:32px;line-height:150%"><span style=";font-family:宋体;font-size:16px">2.</span><span style=";font-family:宋体;font-size:16px">&nbsp;<span style="font-family:宋体">单位负责人为同一人或者存在直接控股、管理关系的不同供应商，不得参加同一合同项下的采购活动。</span></span></p><p style="text-indent: 32px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">六、采购项目联系方式：</span></span></p><p style="text-indent: 32px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">&nbsp;&nbsp;&nbsp;&nbsp;1.采 购 人：恒丰银行股份有限公司</span></p><p style="text-indent: 80px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">联</span> <span style="font-family:宋体">系</span> <span style="font-family:宋体">人：</span></span><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">丛君晓</span></span></p><p style="text-indent: 80px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">电</span> &nbsp;&nbsp;&nbsp;<span style="font-family:宋体">话：</span></span><span style=";font-family:宋体;line-height:150%;font-size:16px">0535-3026099</span></p><p style="text-indent: 64px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px">2.采购代理机构：山东信一项目管理有限公司</span></p><p style="text-indent: 80px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">联</span> <span style="font-family:宋体">系</span> <span style="font-family:宋体">人：</span></span><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">刘炳强</span></span></p><p style="text-indent: 80px;line-height: 150%"><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">联系电话：</span></span><span style=";font-family:宋体;line-height:150%;font-size:16px">0535-211195</span><span style=";font-family:宋体;line-height:150%;font-size:16px">6</span></p><p style="text-indent:612px;line-height:150%"><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">发</span> <span style="font-family:宋体">布</span> <span style="font-family:宋体">人：</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px"><span style="font-family:宋体">山东信一项目管理有限公司</span></span></span></p><p style="margin-right:7px;text-indent:612px;line-height:150%"><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">发布时间：</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px">201</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px">9</span></span><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">年</span></span><span style="text-decoration:underline;"><span style="font-family: 宋体;line-height: 150%;font-size: 16px">1</span></span><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">月</span></span><span style=";font-family:宋体;line-height:150%;font-size:16px">15</span><span style=";font-family:宋体;line-height:150%;font-size:16px"><span style="font-family:宋体">日</span></span></p><p><br/></p>
+                            </b>
+                        </div>
+                        <div class="notice_message">
+                            <p>采购人：恒丰银行</p>
+                        </div>
+                    </div>
+
+
+
+
+                    </p>
+
+
+                </div>
+                <!--详细内容End-->
+
+
+            </div>
+
+            <!-- 侧边栏 -->
+            <div class="hidden-print col-lg-3 text-center cfcpn_news_sidebar">
+                <img src="/webPage/assets/images_plat/cont_ad02.jpg" class="img-responsive center-block">
+                <a href="#" target="_blank"><img src="/webPage/assets/images_plat/cont_ad03.jpg"
+                                                 class="img-responsive center-block" alt="广告位290*350"></a>
+                <a href="#" target="_blank"><img src="/webPage/assets/images_plat/cont_ad04.jpg"
+                                                 class="img-responsive center-block" alt="广告位290*350"></a>
+            </div>
+            <!-- 侧边栏End -->
+        </div>
+        <!-- 公告内容End -->
+
+    </div>
+
+</div>
+<!-- 公告详情End -->
+
+<div class="clearfix"></div>
+
+
+<!-- 页脚 -->
+<footer>
+    <div class="container-fluid text-center cfcpn_footer cfcpn_line_height100">
+        <p>Copyright©2008　中国金融集中采购网版权所有　京ICP备11024531号-1　京ICP证100491号</p>
+        <p>北京市西城区佟麟阁路95号尚信大厦12层</p>
+    </div>
+</footer>
+
+</body>
+</html>

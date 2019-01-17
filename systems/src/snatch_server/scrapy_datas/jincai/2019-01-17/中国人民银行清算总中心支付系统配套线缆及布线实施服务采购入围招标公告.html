@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>金采网-公告详情</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 引入 Bootstrap -->
+    <link href="/webPage/assets/css_plat/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="/webPage/assets/css_plat/font-awesome.min.css"/>
+    <link href="/webPage/assets/css_plat/cfcpn_CSS.css" rel="stylesheet"><!-- 金采网CSS样式 -->
+    <link rel="stylesheet" type="text/css" href="/webPage/assets/css_plat/detail_css/common.css">
+    <link rel="stylesheet" type="text/css" href="/webPage/assets/css_plat/detail_css/notice.css">
+    <link rel="stylesheet" type="text/css" href="/webPage/assets/css_plat/detail_css/list.css">
+    <link rel="stylesheet" type="text/css" href="/webPage/assets/css_plat/detail_css/table.css">
+    <!-- HTML5 Shim 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
+    <!-- 注意： 如果通过 file://  引入 Respond.js 文件，则该文件无法起效果 -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="/webPage/assets/js_plat/jquery-2.1.3.min.js"></script><!-- 轮播图 -->
+    <script type="text/javascript" src="/webPage/assets/js_plat/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/webPage/js/layer/layer.js"></script>
+    <script type="text/javascript" src="/webPage/js/tools/md5.js"></script>
+    <script>
+        /**
+         * 文件上传
+         * @param pidElemid
+         * @param textElemid
+         * @param supType
+         * @param sixStr
+         * @param filesize 文件大小
+         * @param idElemid
+         * @param fileNameId
+         * @param collectId 公告id
+         */
+        function uploadFile(pidElemid, textElemid, supType, sixStr, filesize, idElemid, fileNameId, collectId) {
+            var ck = getCookie("cfcpnKey");
+            var orgId = "";
+            if (ck == null || ck == '') {
+                alert("未登录，请前往首页登录或注册！");
+                window.location.href = "/";
+                return;
+            } else {
+                var json = eval("(" + ck + ")");
+                orgId = json.orgId;
+                if (orgId == null || orgId == '') {
+                    alert("未登录，请前往首页登录或注册！");
+                    window.location.href = "/";
+                    return;
+                }
+            }
+            $.ajax({
+                url: "/front/article/collect",// 跳转到 action
+                data: {"collId": collectId, "orgId": orgId},
+                type: 'post',
+                cache: false,
+                dataType: 'json',
+                success: function (data) {
+                    var isok = data.isok;
+                    var url = "/upload_sign_file?orgId=" + orgId + "&collectId=" + collectId + "&idElemid=" + idElemid + "&pidElemid=" + pidElemid +
+                        "&textElemid=" + textElemid +
+                        "&supType=" + supType +
+                        "&sixStr=" + sixStr +
+                        "&filesize=" + filesize +
+                        "&fileNameId=" + fileNameId +
+                        "&supId=" + data.supId;
+                    if (data.sign_require == undefined){
+                        data.sign_require = '';
+                    }
+                    url +=  "&sign_require=" + data.sign_require;
+                    if (isok == "T") {
+                        var data = data.data;
+                        layer.open({
+                            area: ['800px', '600px'],
+                            title: "上传报名文件",
+                            type: 2,
+                            content: encodeURI(url),
+                            resize: "true",
+                            yes: function () {
+                                layer.close();
+                            }
+                        });
+                    } else {
+                        layer.alert(data.msg);
+                    }
+
+                },
+                error: function () {
+                    alert("异常！");
+                }
+            });
+
+        }
+        $(function () {
+            var ck = getCookie("cfcpnKey");
+            var orgId = "";
+            if (ck == null || ck == '') {
+                return;
+            } else {
+                var json = eval("(" + ck + ")");
+                orgId = json.orgId;
+                if (orgId == null || orgId == '') {
+                    return;
+                }
+            }
+        });
+        //读Cookie，返回值为相应Cookie的内容
+        function getCookie(cookieName) {
+            var cookieContent = '';
+            var cookieAry = document.cookie.split("; ");//得到Cookie数组
+            for (var i = 0; i < cookieAry.length; i++) {
+                var temp = cookieAry[i].split("=");
+                if (temp[0] == cookieName) {
+                    cookieContent = unescape(temp[1]);
+                }
+            }
+            return cookieContent;
+        }
+    </script>
+</head>
+<body>
+
+<!-- 头部 -->
+<!-- 首页导航条 -->
+<!-- 引入 Bootstrap -->
+<link href="/webPage/assets/css_plat/bootstrap.css" rel="stylesheet">
+<link rel="stylesheet" href="/webPage/assets/css_plat/font-awesome.min.css"/>
+<link href="/webPage/assets/css_plat/cfcpn_CSS.css" rel="stylesheet"><!-- 金采网CSS样式 -->
+<script type="text/javascript" src="/webPage/assets/js_plat/jquery-2.1.3.min.js"></script><!-- 轮播图 -->
+<script type="text/javascript" src="/webPage/assets/js_plat/bootstrap.min.js"></script>
+<script>
+
+//    $(function () {
+//        var currUrl = window.location.pathname;
+//        console.log("url==>>" + currUrl);
+//        var ul = document.getElementById("ulnav")
+//        lilist = ul.getElementsByTagName("li")
+//        switch (currUrl) {
+//            case "/": {
+//                lilist[0].className = "cfcpn_nav_active";
+//            }
+//                break;
+//            case   "/service_bank": {
+//                lilist[1].className = "cfcpn_nav_active";
+//            }
+//                break
+//            case     "/service_supplier": {
+//                lilist[2].className = "cfcpn_nav_active";
+//            }
+//                break
+//            case     "/review": {
+//                lilist[3].className = "cfcpn_nav_active";
+//            }
+//                break
+//            case    "/program2017": {
+//                lilist[4].className = "cfcpn_nav_active";
+//            }
+//                break
+//            case     "/download_magazine": {
+//                lilist[5].className = "cfcpn_nav_active";
+//            }
+//                break
+//            case     "/about_us": {
+//                lilist[6].className = "cfcpn_nav_active";
+//            }
+//                break
+//            default: {
+//                lilist[0].className = "cfcpn_nav_active";
+//                return
+//            }
+//        }
+//    });
+
+
+</script>
+<!-- 首页导航条 -->
+<nav class="navbar navbar-default cfcpn_nav" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#cfcpn_navbar"
+                    aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar" style="color:#FFF;"></span>
+                <span class="icon-bar" style="color:#FFF;"></span>
+                <span class="icon-bar" style="color:#FFF;"></span>
+            </button>
+            <a href="/"><img src="/webPage/assets/images_plat/nav_logo.jpg" alt="logo"></a>
+        </div>
+
+        <!--向右对齐-->
+        <div class="collapse navbar-collapse" id="cfcpn_navbar">
+            <ul id="ulnav" class="nav navbar-nav navbar-right">
+                <li><a href="/">首页</a></li>
+                <li><a href="/service_bank">金融机构服务</a></li>
+                <li><a href="/service_supplier">供应商服务</a></li>
+                <li><a href="/review">活动回顾</a></li>
+                <li><a>活动报名</a></li>
+                <li><a href="/download_magazine">相关下载</a></li>
+                <li style="background:url(/webPage/assets/images_plat/hot005.gif) no-repeat 72px 5px"><a href="http://ec.cfcpn.com">金采e平台</a></li>
+                <li><a href="/about_us">关于我们</a></li>
+            </ul>
+        </div>
+
+    </div>
+</nav>
+<!-- 首页导航条End -->
+<!-- 头部End -->
+
+<div class="clearfix"></div>
+
+<!-- 欢迎注册 -->
+<script type="text/javascript" src="/webPage/js/tools/md5.js"></script>
+<script type="text/javascript">
+
+    window.onload = function () {
+        initUser();
+    }
+    function initUser() {
+        if ("/service_bank" === window.location.pathname) {
+            var a = document.getElementById("sub_title");
+            var b = document.getElementById("sub_title1");
+            a.style.visibility = "hidden";
+            b.style.visibility = "hidden";
+//           .visibility = "hidden";
+        }
+        var cfcpnKeyJson = getCookie("cfcpnKey");
+        if (cfcpnKeyJson != null && cfcpnKeyJson != "") {
+            var result = jQuery.parseJSON(cfcpnKeyJson);
+            var uname = result.userEname;
+            var pass = result.pwsd;
+            var validTime = result.validTime;
+            //校验时间
+            //starttime ='2012-12-25 20:17:24';
+            starttime = validTime.replace(new RegExp("-", "gm"), "/");
+            starttime = starttime.replace(new RegExp("@", "gm"), " ");
+            var endtimeHaoMiao = (new Date(starttime)).getTime(); //得到毫秒数
+            var curHaoMiao = new Date().getTime();
+            if ((endtimeHaoMiao - curHaoMiao) < 1200000) {
+                //授权验证
+                $.ajax({
+                    cache: true,
+                    type: "POST",
+                    url: '/cfcpnLogin/checkAuth',
+                    data: {userEname: uname, pwsd: pass, validTime: validTime},
+                    async: false,
+                    error: function (data) {
+                        //alert("连接服务器异常!");
+                    },
+                    success: function (resultJson) {
+                        if (resultJson.isok == 'T') {
+                            var lastr = JSON.stringify(resultJson); //将JSON对象转化为JSON字符
+                            document.cookie = "cfcpnKey=" + escape(lastr);//cookieName为要写入的Cookie的名称
+                            loginOk();
+                            $("#userCname").html(resultJson.userCname);
+                        } else {
+                            delCookie("cfcpnKey");
+                        }
+                    }
+                });
+            } else {
+                loginOk();
+                $("#userCname").html(result.userCname);
+            }
+        }
+    }
+    function sub() {
+        //$("#loginbtn").html("请等待...<img src='http://www.cfcpn.com:80//images/login/loading.gif'/> ");
+        $("#loginbtn").attr("disabled", "disabled");
+        var uname = $("#uname").val();
+        var pass = $("#upass").val();
+        pass = pass.md5();
+        //document.getElementById("loginForm").submit();
+        if (uname == "" || pass == "") {
+            alert("账号或密码不能为空!");
+            return false;
+        }
+        //登录
+        $.ajax({
+            cache: true,
+            type: "POST",
+            url: '/cfcpnLogin/login',
+            data: {userEname: uname, pwsd: pass, "ltype": "1"},
+            async: false,
+            error: function (data) {
+                alert("连接服务器异常!");
+            },
+            success: function (result) {
+                //alert(data);
+                //var result = jQuery.parseJSON(data);
+                if (result.isok == 'T') {
+                    var ename = result.userEname;
+                    var valDate = result.validTime;
+                    var pswd = result.pwsd;
+                    //写入cookie
+                    var lastr = JSON.stringify(result); //将JSON对象转化为JSON字符
+                    document.cookie = "cfcpnKey=" + escape(lastr);//cookieName为要写入的Cookie的名称
+                    //$("#loginNo").hide();
+                    //$("#loginOk").show();
+                    loginOk();//登录效果
+                    $("#userCname").html(result.userCname);
+                } else {
+                    delCookie("cfcpnKey");
+                    $("#loginbtn1").html("登 录");
+                    $('#loginbtn1').removeAttr("disabled");
+                    alert("登录失败,您的用户名或者密码错误!");
+                    getImage();
+                }
+            }
+        });
+    }
+    function logout() {
+        delCookie("cfcpnKey");
+        location.reload();
+    }
+    function delCookie(name) {//为了删除指定名称的cookie，可以将其过期时间设定为一个过去的时间
+        var date = new Date();
+        date.setTime(date.getTime() - 10000);
+        document.cookie = name + "=a; expires=" + date.toGMTString();
+    }
+    //读Cookie，返回值为相应Cookie的内容
+    function getCookie(cookieName) {
+        var cookieContent = '';
+        var cookieAry = document.cookie.split("; ");//得到Cookie数组
+        for (var i = 0; i < cookieAry.length; i++) {
+            var temp = cookieAry[i].split("=");
+            if (temp[0] == cookieName) {
+                cookieContent = unescape(temp[1]);
+            }
+        }
+        return cookieContent;
+    }
+    //进入后台
+    function toSup() {
+        var cfcpnKeyJson = getCookie("cfcpnKey");
+        if (cfcpnKeyJson != null && cfcpnKeyJson != "") {
+            var result = jQuery.parseJSON(cfcpnKeyJson);
+            var uname = result.userEname;
+            var pass = result.pwsd;
+            var pwd = result.pwd;
+            var userType = result.userType;
+            var go = result.go;
+            var supUrl = result.supUrl;
+            var validTime = result.validTime;
+            window.location.href = supUrl + "/loginSe.jsp?u=" + uname + "&p=" + pass + "&pwd=" + pwd + "&v=" + validTime + "&userType=" + userType + "&goUrl=" + go;
+
+        }
+    }
+
+
+    $(function () {
+        $("#showLogin").bind("keydown", function (e) {
+            // 兼容FF和IE和Opera
+            var theEvent = e || window.event;
+            var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
+            if (code == 13) {
+                //回车执行查询
+                $("#loginbtn1").click();
+            }
+        });
+    })
+
+</script>
+<script type="text/javascript">
+    var isLoginStatus = false;//全局变量判断登录状态
+    function loginOk() {
+        isLoginStatus = true;
+        $("#loginNo").animate({height: 'hide'});
+        $("#showLogin").animate({height: 'hide'});
+        setTimeout(function () {
+            $("#loginOk").animate({height: 'show'});
+        }, 600);
+    }
+    function logoutOk() {
+        $("#loginNo").animate({height: 'show'});
+        $("#loginOk").animate({height: 'hide'});
+    }
+
+    function showLogin() {
+        $("#loginNo").animate({height: 'hide'});
+        $("#showLogin").animate({height: 'show'});
+    }
+    function hideLogin() {
+        $("#loginNo").animate({height: 'show'});
+        $("#showLogin").animate({height: 'hide'});
+    }
+</script>
+<div class="cfcpn_register">
+    <div class="container">
+        <!-- 未登陆状态 -->
+        <div id="loginNo" class="row" style="display:block;">
+            <span id="sub_title" class="col-md-11 col-xs-12 ">您与金融客户只差一个“金采网+”</span>
+            <span class="col-md-1 col-xs-12 cfcpn_logged-in_bar">
+            <a href="/register">注册</a> |
+            <a href="javascript:void(0)" onclick="showLogin()">登录</a>
+          </span>
+        </div>
+        <!-- 未登陆状态End -->
+
+        <!-- 已登陆状态 -->
+        <div id="loginOk" class="row" style="display:none;">
+            <span id="sub_title1" class="col-md-8 col-xs-12 sub_title">您与金融客户只差一个“金采网+”</span>
+            <span class="col-md-4 cfcpn_logged-in_bar">
+                欢迎您，<a href="javascript:void(0)" onclick="toSup()"><span id="userCname"></span></a> &nbsp; |&nbsp;
+            <a href="javascript:void(0)" onclick="logout()">退出</a>
+          </span>
+        </div>
+        <!-- 已登陆状态End -->
+    </div>
+
+    <!-- 显示登录输入框 -->
+    <div id="showLogin" class="container" style="display:none;">
+        <div class="row">
+            <div class="col-md-4 col-sm-6 cfcpn_login_input">
+                <div class="input-group">
+                    <span class="input-group-addon glyphicon glyphicon-user" id="sizing-addon1"></span>
+                    <input id="uname" type="text" class="form-control" placeholder="用户名">
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-4 -->
+            <div class="col-md-4 col-sm-6 cfcpn_login_input">
+                <div class="input-group">
+                    <span class="input-group-addon glyphicon glyphicon-lock" id="sizing-addon2"></span>
+                    <input id="upass" type="password" class="form-control" placeholder="密码">
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-4 -->
+            <div class="col-md-4 col-sm-12 cfcpn_login_input">
+                <div class="input-group">
+                <span class="input-group-btn">
+                  <button id="loginbtn1" onclick="sub()" class="btn btn-primary cfcpn_login_btn"
+                          type="button">登录</button>
+                </span>
+                    <span class="cfcpn_login_register">
+                      <a href="javascript:void(0)" onclick="hideLogin()" style="color: #fd9f3e">取消</a>
+                    </span>
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-4 -->
+        </div><!-- /.row -->
+    </div>
+    <!-- 显示登录输入框End -->
+</div>
+
+<!-- 欢迎注册End -->
+
+<div class="clearfix"></div>
+
+<!-- 公告详情 -->
+<div class="container-fluid cfcpn_container_list-bg">
+
+    <div class="container">
+        <!-- 面包屑导航 -->
+        <span class="hidden-print">位置：</span>
+        <ol class="hidden-print breadcrumb cfcpn_news_breadcrumb">
+                        <li><a href="/">首页</a></li>
+            <li><a href=/plist/caigou>采供公告</a></li>
+            <li class="active">详情</li>
+        </ol>
+        <!-- 面包屑导航End -->
+
+        <div class="clearfix"></div>
+
+        <!-- 公告内容 -->
+        <div class="row">
+            <div class="col-lg-9 cfcpn_news_mian">
+
+
+                <div id="news_head">
+                    <p class="cfcpn_news_title">中国人民银行清算总中心支付系统配套线缆及布线实施服务采购入围招标公告</p>
+                    <p class="cfcpn_news_date">发布时间：2019-01-16 11:02:47</p>
+                    <div class="hidden-print cfcpn_news_step">
+                        <div class="col-lg-3 col-sm-3">
+                            <p class="glyphicon glyphicon-user cfcpn_news_step-icon"></p>
+                            <p style="margin-bottom:0px;">采购人</p>
+                            <p>中国人民银行清算总中心</p>
+                        </div>
+                        <div class="col-lg-3 col-sm-3 col-xs-6">
+                            <p class="glyphicon glyphicon-shopping-cart cfcpn_news_step-icon"></p>
+                            <p style="margin-bottom:0px;">采购方式</p>
+                            <p>公开招标</p>
+                        </div>
+                        <div class="col-lg-3 col-sm-3 col-xs-6">
+                            <p class="glyphicon glyphicon-map-marker cfcpn_news_step-icon"></p>
+                            <p style="margin-bottom:0px;">所在地区</p>
+                            <p>北京市 市辖区 </p>
+                        </div>
+                        <div class="col-lg-3 col-sm-3 col-xs-6">
+                            <p class="glyphicon glyphicon-cutlery cfcpn_news_step-icon"></p>
+                            <p style="margin-bottom:0px;">品类</p>
+                            <p>货物 </p>
+                        </div>
+                    </div>
+                    <br>
+                    <p align="center">
+                                            </p>
+
+
+                </div>
+
+                <!--详细内容Startt-->
+                <div id="news_content">
+                    <p id="infoText" class=" text-left" style="line-height:200%;">
+
+                    <div class="notice">
+                        <div class="notice_describe">
+                            <b>
+                                <p style="text-indent:32px;line-height:150%"><strong>1．招标条件</strong></p><p style="text-indent:32px;line-height:150%">本招标项目的招标人为<strong><span style="text-decoration:underline;">中国人民银行清算总中心</span></strong>，资金来源：<strong><span style="text-decoration:underline;">单位自筹</span></strong>。项目己具备招标条件。</p><p style="text-indent:32px;line-height:150%"><strong><span style="text-decoration:underline;">中信国际招标有限公司</span></strong>（以下简称“招标代理机构”）受<strong><span style="text-decoration:underline;">中国人民银行清算总中心</span></strong>（以下简称“招标人”）的委托，就<strong><span style="text-decoration:underline;">支付系统配套线缆及布线实施服务采购入围</span></strong>（招标编号：<strong><span style="text-decoration:underline;">0733-187912236901</span></strong>）进行<strong><span style="text-decoration:underline;">公开</span></strong>招标。欢迎合格的供应商前来投标。</p><p style="text-indent:32px;line-height:150%"><a name="_Toc184635061"></a><strong>2．</strong><strong>采购内容</strong></p><p style="text-indent:32px;line-height:150%">中国人民银行清算总中心拟采购年度<span style="text-decoration:underline;">配套线缆及布线实施服务的入围供应商，本次招标的需求包含2018年支付系统信息系统存储设备更新改造项目和2017年支付系统实验室建设（三期）项目的配套线缆及布线实施服务</span>，<span style=";line-height:150%">实施区域为北京中心、怀柔主站、上海NPC 、无锡NPC及32个城市处理中心。现通过公开招标方式</span>选择2名合格的投标人作为本项目的入围中标人，入围服务期限自合同签订之日起至2019年12月31日。<a name="_Toc184635062"></a></p><p style="text-indent:32px;line-height:150%">2.1<span style="text-decoration:underline;">上述</span>采购内容详见第五章技术需求书中3.3布线系统设备配置。</p><p style="text-indent:32px;line-height:150%">2.2本项目第一批采购内容详见第五章技术需求书中3.4第一批采购内容。</p><p style="text-indent:64px;line-height:150%">第一批采购产品交货期；合同签订后60天内。<span style=";line-height:150%">第一批采购产品工期要求为上海NPC、无锡NPC每个点各3天（共6天）</span></p><p style="text-indent:32px;line-height:150%"><strong>3．</strong><strong>合格投标人</strong></p><p style="text-indent:32px;line-height:150%"><a name="_Toc184635063"></a>3.1投标人须为中华人民共和国境内合法注册的独立法人，遵守国家有关法律、法规，具有良好的商业信誉和健全的财务会计制度，没有处于被责令停业、投标资格被取消、财产被冻结、破产的状态，且在连续三年里没有骗取中标和重大的设计质量问题。</p><p style="text-indent:32px;line-height:150%">3.2投标人应为具有相关经营范围、有资格和能力提供本项目的货物或服务的制造商或代理商。制造商的货物应为非OEM产品。如投标人所投货物主要产品并非自己制造，须取得该主要产品制造商出具的同意投标人在本次投标中提供该产品的授权书和质量保证和服务承诺。（不接受代表处、办事处、分公司等不具备独立承担民事责任能力单位的授权。）（提供投标产品的图片或彩色样本装订入投标文件内。）</p><p style="text-indent:32px;line-height:150%"><strong>主要设备授权要求表</strong></p><table cellspacing="0" cellpadding="0" width="582"><tbody><tr style=";height:22px" class="firstRow"><td width="67" valign="bottom" style="border-width: 1px; border-color: windowtext; background: white; padding: 0px 7px;" height="22"><p style="text-align:center"><strong>序号</strong></p></td><td width="152" valign="top" style="border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-top-color: windowtext; border-right-color: windowtext; border-bottom-color: windowtext; border-left: none; background: white; padding: 0px 7px;" height="22"><p style="text-align:center"><strong>类别</strong></p></td><td width="363" valign="bottom" style="border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-top-color: windowtext; border-right-color: windowtext; border-bottom-color: windowtext; border-left: none; background: white; padding: 0px 7px;" height="22"><p style="text-align:center"><strong>产品</strong></p></td></tr><tr style=";height:22px"><td width="67" valign="bottom" style="border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-right-color: windowtext; border-bottom-color: windowtext; border-left-color: windowtext; border-top: none; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">1</p></td><td width="152" valign="top" style="border-top: none; border-left: none; border-bottom-width: 1px; border-bottom-color: windowtext; border-right-width: 1px; border-right-color: windowtext; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">光纤模盒</p></td><td width="363" valign="bottom" style="border-top: none; border-left: none; border-bottom-width: 1px; border-bottom-color: windowtext; border-right-width: 1px; border-right-color: windowtext; background: white; padding: 0px 7px;" height="22"><p style="text-align:center"><span style="font-size:14px">MPO/MTP-LC </span><span style="font-size:14px">转换模块盒</span></p></td></tr><tr style=";height:22px"><td width="67" valign="bottom" style="border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-right-color: windowtext; border-bottom-color: windowtext; border-left-color: windowtext; border-top: none; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">2</p></td><td width="152" valign="top" style="border-top: none; border-left: none; border-bottom-width: 1px; border-bottom-color: windowtext; border-right-width: 1px; border-right-color: windowtext; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">光纤配线架</p></td><td width="363" valign="bottom" style="border-top: none; border-left: none; border-bottom-width: 1px; border-bottom-color: windowtext; border-right-width: 1px; border-right-color: windowtext; background: white; padding: 0px 7px;" height="22"><p style="text-align:center"><span style="font-size:14px">预端接机架式光配线架</span></p></td></tr><tr style=";height:22px"><td width="67" valign="bottom" style="border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-right-color: windowtext; border-bottom-color: windowtext; border-left-color: windowtext; border-top: none; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">3</p></td><td width="152" valign="top" style="border-top: none; border-left: none; border-bottom-width: 1px; border-bottom-color: windowtext; border-right-width: 1px; border-right-color: windowtext; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">以太网模块</p></td><td width="363" valign="bottom" style="border-top: none; border-left: none; border-bottom-width: 1px; border-bottom-color: windowtext; border-right-width: 1px; border-right-color: windowtext; background: white; padding: 0px 7px;" height="22"><p style="text-align:center"><span style="font-size:14px">CAT 6A</span><span style="font-size:14px">非屏蔽信息模块</span></p></td></tr><tr style=";height:22px"><td width="67" valign="bottom" style="border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-right-color: windowtext; border-bottom-color: windowtext; border-left-color: windowtext; border-top: none; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">4</p></td><td width="152" valign="top" style="border-top: none; border-left: none; border-bottom-width: 1px; border-bottom-color: windowtext; border-right-width: 1px; border-right-color: windowtext; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">以太网配线架</p></td><td width="363" valign="bottom" style="border-top: none; border-left: none; border-bottom-width: 1px; border-bottom-color: windowtext; border-right-width: 1px; border-right-color: windowtext; background: white; padding: 0px 7px;" height="22"><p style="text-align:center"><span style="font-size:14px">CAT 6A</span><span style="font-size:14px">非屏蔽数据模块配线架</span></p></td></tr><tr style=";height:22px"><td width="67" valign="bottom" style="border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-right-color: windowtext; border-bottom-color: windowtext; border-left-color: windowtext; border-top: none; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">5</p></td><td width="152" rowspan="7" style="border-top: none; border-left: none; border-bottom-width: 1px; border-bottom-color: windowtext; border-right-width: 1px; border-right-color: windowtext; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">光缆</p></td><td width="363" valign="bottom" style="border-top: none; border-left: none; border-bottom-width: 1px; border-bottom-color: windowtext; border-right-width: 1px; border-right-color: windowtext; background: white; padding: 0px 7px;" height="22"><p style="text-align:center"><span style="font-size:14px">MPO</span><span style="font-size:14px">多模光纤跳线</span></p></td></tr><tr style=";height:22px"><td width="67" valign="bottom" style="border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-right-color: windowtext; border-bottom-color: windowtext; border-left-color: windowtext; border-top: none; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">6</p></td><td width="363" valign="bottom" style="border-top: none; border-left: none; border-bottom-width: 1px; border-bottom-color: windowtext; border-right-width: 1px; border-right-color: windowtext; background: white; padding: 0px 7px;" height="22"><p style="text-align:center"><span style="font-size:14px">MPO</span><span style="font-size:14px">单模光纤跳线</span></p></td></tr><tr style=";height:22px"><td width="67" valign="bottom" style="border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-right-color: windowtext; border-bottom-color: windowtext; border-left-color: windowtext; border-top: none; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">7</p></td><td width="363" valign="bottom" style="border-top: none; border-left: none; border-bottom-width: 1px; border-bottom-color: windowtext; border-right-width: 1px; border-right-color: windowtext; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">12芯LC-LC多模OM4集束光纤跳线</p></td></tr><tr style=";height:22px"><td width="67" valign="bottom" style="border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-right-color: windowtext; border-bottom-color: windowtext; border-left-color: windowtext; border-top: none; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">8</p></td><td width="363" valign="bottom" style="border-top: none; border-left: none; border-bottom-width: 1px; border-bottom-color: windowtext; border-right-width: 1px; border-right-color: windowtext; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">LC-LC多模OM4跳线-OFNP</p></td></tr><tr style=";height:22px"><td width="67" valign="bottom" style="border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-right-color: windowtext; border-bottom-color: windowtext; border-left-color: windowtext; border-top: none; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">9</p></td><td width="363" valign="bottom" style="border-top: none; border-left: none; border-bottom-width: 1px; border-bottom-color: windowtext; border-right-width: 1px; border-right-color: windowtext; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">LC-LC多模OM3跳线-OFNR</p></td></tr><tr style=";height:22px"><td width="67" valign="bottom" style="border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-right-color: windowtext; border-bottom-color: windowtext; border-left-color: windowtext; border-top: none; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">10</p></td><td width="363" valign="bottom" style="border-top: none; border-left: none; border-bottom-width: 1px; border-bottom-color: windowtext; border-right-width: 1px; border-right-color: windowtext; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">LC-LC单模OM4跳线-OFNP</p></td></tr><tr style=";height:22px"><td width="67" valign="bottom" style="border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-right-color: windowtext; border-bottom-color: windowtext; border-left-color: windowtext; border-top: none; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">11</p></td><td width="363" valign="bottom" style="border-top: none; border-left: none; border-bottom-width: 1px; border-bottom-color: windowtext; border-right-width: 1px; border-right-color: windowtext; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">12芯室内单模万兆预端接光缆</p></td></tr><tr style=";height:22px"><td width="67" valign="bottom" style="border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-right-color: windowtext; border-bottom-color: windowtext; border-left-color: windowtext; border-top: none; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">12</p></td><td width="152" rowspan="2" style="border-top: none; border-left: none; border-bottom-width: 1px; border-bottom-color: windowtext; border-right-width: 1px; border-right-color: windowtext; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">铜缆</p></td><td width="363" valign="bottom" style="border-top: none; border-left: none; border-bottom-width: 1px; border-bottom-color: windowtext; border-right-width: 1px; border-right-color: windowtext; background: white; padding: 0px 7px;" height="22"><p style="text-align:center">6A类非屏蔽跳线</p></td></tr><tr style=";height:21px"><td width="67" valign="bottom" style="border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-right-color: windowtext; border-bottom-color: windowtext; border-left-color: windowtext; border-top: none; background: white; padding: 0px 7px;" height="21"><p style="text-align:center">13</p></td><td width="363" valign="bottom" style="border-top: none; border-left: none; border-bottom-width: 1px; border-bottom-color: windowtext; border-right-width: 1px; border-right-color: windowtext; background: white; padding: 0px 7px;" height="21"><p style="text-align:center">6A类现场端接非屏蔽铜缆</p></td></tr></tbody></table><p style="text-indent:32px;line-height:150%">&nbsp;</p><p style="text-indent:32px;line-height:150%">3.3投标人须在法律和财务上独立、合法运作并独立于招标人和代理机构，不得直接或间接地与招标人为本项目所委托的其他机构有任何关联。投标人、投标人主要股东、投标人高管或主要负责人不得与招标人有任何关联关系或利害关系。</p><p style="text-indent:32px;line-height:150%">3.4投标人须保证，招标人在其本国使用其提供的货物时，不存在任何已知的不合法的情形，也不存在任何已知的与第三方专利权、著作权、商标权或工业设计权相关的任何争议。如果有任何因招标人使用投标人提供的货物而提起的侵权指控，投标人须依法承担全部责任。</p><p style="text-indent:32px;line-height:150%">3.5法定代表人为同一个人的两个及两个以上法人，母公司与全资子公司/由其控股的子公司，不得同时参加本项目。</p><p style="text-indent:32px;line-height:150%">3.6投标人未被“信用中国”网站（www.creditchina.gov.cn）列入失信名单。</p><p style="text-indent:32px;line-height:150%">3.7未向招标代理机构购买招标文件并登记备案的任何机构不得参与本项目投标。</p><p style="text-indent:32px;line-height:150%">3.8本项目不接受联合体投标。</p><p style="text-indent:32px;line-height:150%"><strong>4．</strong><strong>招标文件的获取</strong></p><p style="text-indent:32px;line-height:150%">4.1 请于<span style="text-decoration:underline;">2019</span>年<span style="text-decoration:underline;">1</span>月<span style="text-decoration:underline;">17</span>日至<span style="text-decoration:underline;">2019</span>年<span style="text-decoration:underline;">1</span>月<span style="text-decoration:underline;">23</span>日，每日上午<span style="text-decoration:underline;">9</span>时至<span style="text-decoration:underline;">11</span>时，下午<span style="text-decoration:underline;">13</span>时至<span style="text-decoration:underline;">16</span>时（北京时间，下同），在<span style="text-decoration:underline;">北京市朝阳区新源南路6号京城大厦A座602室</span>，购买招标文件。</p><p style="text-indent:32px;line-height:150%">4.2领购招标文件须提供以下资料（否则，招标机构将有权拒绝出售）：</p><p style="text-indent:32px;line-height:150%">1）法定代表人授权书原件、被授权人身份证明原件及复印件（加盖公章）；</p><p style="text-indent:32px;line-height:150%">2）营业执照或社会团体登记证书或事业单位法人证书或其他类型主体资格证书复印件（加盖公章）；</p><p style="text-indent:32px;line-height:150%">4.3 招标文件售价人民币500元，售后不退。（邮购招标文件须另付快递费50元人民币。投标人应在招标文件发售时间截止前提交上述资料扫描件，经招标代理机构确认后以电汇形式将标书款及邮购款汇到招标代理机构指定账户。汇款时请注明“招标编号”并请将汇款底单扫描件及单位名称、联系人、电话和传真以邮件形式发送至luohui@biddingcitic.com。招标代理机构将以快递形式及时寄去纸质招标文件，但招标代理机构或招标人在任何情况下对快递过程中发生的迟交或遗失均不承担责任。）</p><p style="text-indent:32px;line-height:150%"><a name="_Toc184635064"></a><strong>5．</strong><strong>投标文件的递交时间及地点</strong></p><p style="text-indent:32px;line-height:150%">5.1 投标文件递交的截止时间（投标截止时间，下同）为<span style="text-decoration:underline;">2019</span>年<span style="text-decoration:underline;">2</span>月<span style="text-decoration:underline;">19</span>日<span style="text-decoration:underline;">13</span>时<span style="text-decoration:underline;">30</span>分（北京时间）</p><p style="text-indent:32px;line-height:150%">5.2投标文件递交地点为：北京金龙潭大饭店三层第二会议室（北京市海淀区西三环北路71号）。</p><p style="text-indent:32px;line-height:150%">注：逾期送达的或者未送达指定地点的投标文件，招标人不予受理。</p><p style="text-indent:32px;line-height:150%"><a name="_Toc184635066"></a><strong>6.开标时间及地点</strong></p><p style="text-indent:32px;line-height:150%">6.1开标时间：<span style="text-decoration:underline;">2019</span>年<span style="text-decoration:underline;">2</span>月<span style="text-decoration:underline;">19</span>日<span style="text-decoration:underline;">13</span>时<span style="text-decoration:underline;">30</span>分（北京时间）</p><p style="text-indent:32px;line-height:150%">6.2开标地点：北京金龙潭大饭店三层第二会议室（北京市海淀区西三环北路71号）。</p><p style="text-indent:32px;line-height:150%"><strong>7．</strong><strong>联系方式</strong></p><p style="text-indent:32px;line-height:150%">招标代理机构：<span style="text-decoration:underline;">中信国际招标有限公司</span></p><p style="text-indent:32px;line-height:150%">地址：<span style="text-decoration:underline;">北京市朝阳区新源南路6号京城大厦A座602室</span></p><p style="text-indent:32px;line-height:150%">邮编：<span style="text-decoration:underline;">100004</span></p><p style="text-indent:32px;line-height:150%">联系人：<span style="text-decoration:underline;">罗慧、裴啸</span></p><p style="text-indent:32px;line-height:150%">电话：<span style="text-decoration:underline;">010-84865055-177、202</span></p><p><span style="font-size:16px;font-family:宋体">&nbsp; 电子邮件：<span style="text-decoration:underline;">luohui@biddingcitic.com</span> 、<a href="mailto:peix@biddingcitic.com">peix@biddingcitic.com</a></span></p><p><br/></p>
+                            </b>
+                        </div>
+                        <div class="notice_message">
+                            <p>采购人：中国人民银行清算总中心</p>
+                        </div>
+                    </div>
+
+
+
+
+                    </p>
+
+
+                </div>
+                <!--详细内容End-->
+
+
+            </div>
+
+            <!-- 侧边栏 -->
+            <div class="hidden-print col-lg-3 text-center cfcpn_news_sidebar">
+                <img src="/webPage/assets/images_plat/cont_ad02.jpg" class="img-responsive center-block">
+                <a href="#" target="_blank"><img src="/webPage/assets/images_plat/cont_ad03.jpg"
+                                                 class="img-responsive center-block" alt="广告位290*350"></a>
+                <a href="#" target="_blank"><img src="/webPage/assets/images_plat/cont_ad04.jpg"
+                                                 class="img-responsive center-block" alt="广告位290*350"></a>
+            </div>
+            <!-- 侧边栏End -->
+        </div>
+        <!-- 公告内容End -->
+
+    </div>
+
+</div>
+<!-- 公告详情End -->
+
+<div class="clearfix"></div>
+
+
+<!-- 页脚 -->
+<footer>
+    <div class="container-fluid text-center cfcpn_footer cfcpn_line_height100">
+        <p>Copyright©2008　中国金融集中采购网版权所有　京ICP备11024531号-1　京ICP证100491号</p>
+        <p>北京市西城区佟麟阁路95号尚信大厦12层</p>
+    </div>
+</footer>
+
+</body>
+</html>

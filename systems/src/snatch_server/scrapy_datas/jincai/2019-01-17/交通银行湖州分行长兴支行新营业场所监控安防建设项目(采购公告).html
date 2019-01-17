@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>金采网-公告详情</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 引入 Bootstrap -->
+    <link href="/webPage/assets/css_plat/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="/webPage/assets/css_plat/font-awesome.min.css"/>
+    <link href="/webPage/assets/css_plat/cfcpn_CSS.css" rel="stylesheet"><!-- 金采网CSS样式 -->
+    <link rel="stylesheet" type="text/css" href="/webPage/assets/css_plat/detail_css/common.css">
+    <link rel="stylesheet" type="text/css" href="/webPage/assets/css_plat/detail_css/notice.css">
+    <link rel="stylesheet" type="text/css" href="/webPage/assets/css_plat/detail_css/list.css">
+    <link rel="stylesheet" type="text/css" href="/webPage/assets/css_plat/detail_css/table.css">
+    <!-- HTML5 Shim 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
+    <!-- 注意： 如果通过 file://  引入 Respond.js 文件，则该文件无法起效果 -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="/webPage/assets/js_plat/jquery-2.1.3.min.js"></script><!-- 轮播图 -->
+    <script type="text/javascript" src="/webPage/assets/js_plat/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/webPage/js/layer/layer.js"></script>
+    <script type="text/javascript" src="/webPage/js/tools/md5.js"></script>
+    <script>
+        /**
+         * 文件上传
+         * @param pidElemid
+         * @param textElemid
+         * @param supType
+         * @param sixStr
+         * @param filesize 文件大小
+         * @param idElemid
+         * @param fileNameId
+         * @param collectId 公告id
+         */
+        function uploadFile(pidElemid, textElemid, supType, sixStr, filesize, idElemid, fileNameId, collectId) {
+            var ck = getCookie("cfcpnKey");
+            var orgId = "";
+            if (ck == null || ck == '') {
+                alert("未登录，请前往首页登录或注册！");
+                window.location.href = "/";
+                return;
+            } else {
+                var json = eval("(" + ck + ")");
+                orgId = json.orgId;
+                if (orgId == null || orgId == '') {
+                    alert("未登录，请前往首页登录或注册！");
+                    window.location.href = "/";
+                    return;
+                }
+            }
+            $.ajax({
+                url: "/front/article/collect",// 跳转到 action
+                data: {"collId": collectId, "orgId": orgId},
+                type: 'post',
+                cache: false,
+                dataType: 'json',
+                success: function (data) {
+                    var isok = data.isok;
+                    var url = "/upload_sign_file?orgId=" + orgId + "&collectId=" + collectId + "&idElemid=" + idElemid + "&pidElemid=" + pidElemid +
+                        "&textElemid=" + textElemid +
+                        "&supType=" + supType +
+                        "&sixStr=" + sixStr +
+                        "&filesize=" + filesize +
+                        "&fileNameId=" + fileNameId +
+                        "&supId=" + data.supId;
+                    if (data.sign_require == undefined){
+                        data.sign_require = '';
+                    }
+                    url +=  "&sign_require=" + data.sign_require;
+                    if (isok == "T") {
+                        var data = data.data;
+                        layer.open({
+                            area: ['800px', '600px'],
+                            title: "上传报名文件",
+                            type: 2,
+                            content: encodeURI(url),
+                            resize: "true",
+                            yes: function () {
+                                layer.close();
+                            }
+                        });
+                    } else {
+                        layer.alert(data.msg);
+                    }
+
+                },
+                error: function () {
+                    alert("异常！");
+                }
+            });
+
+        }
+        $(function () {
+            var ck = getCookie("cfcpnKey");
+            var orgId = "";
+            if (ck == null || ck == '') {
+                return;
+            } else {
+                var json = eval("(" + ck + ")");
+                orgId = json.orgId;
+                if (orgId == null || orgId == '') {
+                    return;
+                }
+            }
+        });
+        //读Cookie，返回值为相应Cookie的内容
+        function getCookie(cookieName) {
+            var cookieContent = '';
+            var cookieAry = document.cookie.split("; ");//得到Cookie数组
+            for (var i = 0; i < cookieAry.length; i++) {
+                var temp = cookieAry[i].split("=");
+                if (temp[0] == cookieName) {
+                    cookieContent = unescape(temp[1]);
+                }
+            }
+            return cookieContent;
+        }
+    </script>
+</head>
+<body>
+
+<!-- 头部 -->
+<!-- 首页导航条 -->
+<!-- 引入 Bootstrap -->
+<link href="/webPage/assets/css_plat/bootstrap.css" rel="stylesheet">
+<link rel="stylesheet" href="/webPage/assets/css_plat/font-awesome.min.css"/>
+<link href="/webPage/assets/css_plat/cfcpn_CSS.css" rel="stylesheet"><!-- 金采网CSS样式 -->
+<script type="text/javascript" src="/webPage/assets/js_plat/jquery-2.1.3.min.js"></script><!-- 轮播图 -->
+<script type="text/javascript" src="/webPage/assets/js_plat/bootstrap.min.js"></script>
+<script>
+
+//    $(function () {
+//        var currUrl = window.location.pathname;
+//        console.log("url==>>" + currUrl);
+//        var ul = document.getElementById("ulnav")
+//        lilist = ul.getElementsByTagName("li")
+//        switch (currUrl) {
+//            case "/": {
+//                lilist[0].className = "cfcpn_nav_active";
+//            }
+//                break;
+//            case   "/service_bank": {
+//                lilist[1].className = "cfcpn_nav_active";
+//            }
+//                break
+//            case     "/service_supplier": {
+//                lilist[2].className = "cfcpn_nav_active";
+//            }
+//                break
+//            case     "/review": {
+//                lilist[3].className = "cfcpn_nav_active";
+//            }
+//                break
+//            case    "/program2017": {
+//                lilist[4].className = "cfcpn_nav_active";
+//            }
+//                break
+//            case     "/download_magazine": {
+//                lilist[5].className = "cfcpn_nav_active";
+//            }
+//                break
+//            case     "/about_us": {
+//                lilist[6].className = "cfcpn_nav_active";
+//            }
+//                break
+//            default: {
+//                lilist[0].className = "cfcpn_nav_active";
+//                return
+//            }
+//        }
+//    });
+
+
+</script>
+<!-- 首页导航条 -->
+<nav class="navbar navbar-default cfcpn_nav" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#cfcpn_navbar"
+                    aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar" style="color:#FFF;"></span>
+                <span class="icon-bar" style="color:#FFF;"></span>
+                <span class="icon-bar" style="color:#FFF;"></span>
+            </button>
+            <a href="/"><img src="/webPage/assets/images_plat/nav_logo.jpg" alt="logo"></a>
+        </div>
+
+        <!--向右对齐-->
+        <div class="collapse navbar-collapse" id="cfcpn_navbar">
+            <ul id="ulnav" class="nav navbar-nav navbar-right">
+                <li><a href="/">首页</a></li>
+                <li><a href="/service_bank">金融机构服务</a></li>
+                <li><a href="/service_supplier">供应商服务</a></li>
+                <li><a href="/review">活动回顾</a></li>
+                <li><a>活动报名</a></li>
+                <li><a href="/download_magazine">相关下载</a></li>
+                <li style="background:url(/webPage/assets/images_plat/hot005.gif) no-repeat 72px 5px"><a href="http://ec.cfcpn.com">金采e平台</a></li>
+                <li><a href="/about_us">关于我们</a></li>
+            </ul>
+        </div>
+
+    </div>
+</nav>
+<!-- 首页导航条End -->
+<!-- 头部End -->
+
+<div class="clearfix"></div>
+
+<!-- 欢迎注册 -->
+<script type="text/javascript" src="/webPage/js/tools/md5.js"></script>
+<script type="text/javascript">
+
+    window.onload = function () {
+        initUser();
+    }
+    function initUser() {
+        if ("/service_bank" === window.location.pathname) {
+            var a = document.getElementById("sub_title");
+            var b = document.getElementById("sub_title1");
+            a.style.visibility = "hidden";
+            b.style.visibility = "hidden";
+//           .visibility = "hidden";
+        }
+        var cfcpnKeyJson = getCookie("cfcpnKey");
+        if (cfcpnKeyJson != null && cfcpnKeyJson != "") {
+            var result = jQuery.parseJSON(cfcpnKeyJson);
+            var uname = result.userEname;
+            var pass = result.pwsd;
+            var validTime = result.validTime;
+            //校验时间
+            //starttime ='2012-12-25 20:17:24';
+            starttime = validTime.replace(new RegExp("-", "gm"), "/");
+            starttime = starttime.replace(new RegExp("@", "gm"), " ");
+            var endtimeHaoMiao = (new Date(starttime)).getTime(); //得到毫秒数
+            var curHaoMiao = new Date().getTime();
+            if ((endtimeHaoMiao - curHaoMiao) < 1200000) {
+                //授权验证
+                $.ajax({
+                    cache: true,
+                    type: "POST",
+                    url: '/cfcpnLogin/checkAuth',
+                    data: {userEname: uname, pwsd: pass, validTime: validTime},
+                    async: false,
+                    error: function (data) {
+                        //alert("连接服务器异常!");
+                    },
+                    success: function (resultJson) {
+                        if (resultJson.isok == 'T') {
+                            var lastr = JSON.stringify(resultJson); //将JSON对象转化为JSON字符
+                            document.cookie = "cfcpnKey=" + escape(lastr);//cookieName为要写入的Cookie的名称
+                            loginOk();
+                            $("#userCname").html(resultJson.userCname);
+                        } else {
+                            delCookie("cfcpnKey");
+                        }
+                    }
+                });
+            } else {
+                loginOk();
+                $("#userCname").html(result.userCname);
+            }
+        }
+    }
+    function sub() {
+        //$("#loginbtn").html("请等待...<img src='http://www.cfcpn.com:80//images/login/loading.gif'/> ");
+        $("#loginbtn").attr("disabled", "disabled");
+        var uname = $("#uname").val();
+        var pass = $("#upass").val();
+        pass = pass.md5();
+        //document.getElementById("loginForm").submit();
+        if (uname == "" || pass == "") {
+            alert("账号或密码不能为空!");
+            return false;
+        }
+        //登录
+        $.ajax({
+            cache: true,
+            type: "POST",
+            url: '/cfcpnLogin/login',
+            data: {userEname: uname, pwsd: pass, "ltype": "1"},
+            async: false,
+            error: function (data) {
+                alert("连接服务器异常!");
+            },
+            success: function (result) {
+                //alert(data);
+                //var result = jQuery.parseJSON(data);
+                if (result.isok == 'T') {
+                    var ename = result.userEname;
+                    var valDate = result.validTime;
+                    var pswd = result.pwsd;
+                    //写入cookie
+                    var lastr = JSON.stringify(result); //将JSON对象转化为JSON字符
+                    document.cookie = "cfcpnKey=" + escape(lastr);//cookieName为要写入的Cookie的名称
+                    //$("#loginNo").hide();
+                    //$("#loginOk").show();
+                    loginOk();//登录效果
+                    $("#userCname").html(result.userCname);
+                } else {
+                    delCookie("cfcpnKey");
+                    $("#loginbtn1").html("登 录");
+                    $('#loginbtn1').removeAttr("disabled");
+                    alert("登录失败,您的用户名或者密码错误!");
+                    getImage();
+                }
+            }
+        });
+    }
+    function logout() {
+        delCookie("cfcpnKey");
+        location.reload();
+    }
+    function delCookie(name) {//为了删除指定名称的cookie，可以将其过期时间设定为一个过去的时间
+        var date = new Date();
+        date.setTime(date.getTime() - 10000);
+        document.cookie = name + "=a; expires=" + date.toGMTString();
+    }
+    //读Cookie，返回值为相应Cookie的内容
+    function getCookie(cookieName) {
+        var cookieContent = '';
+        var cookieAry = document.cookie.split("; ");//得到Cookie数组
+        for (var i = 0; i < cookieAry.length; i++) {
+            var temp = cookieAry[i].split("=");
+            if (temp[0] == cookieName) {
+                cookieContent = unescape(temp[1]);
+            }
+        }
+        return cookieContent;
+    }
+    //进入后台
+    function toSup() {
+        var cfcpnKeyJson = getCookie("cfcpnKey");
+        if (cfcpnKeyJson != null && cfcpnKeyJson != "") {
+            var result = jQuery.parseJSON(cfcpnKeyJson);
+            var uname = result.userEname;
+            var pass = result.pwsd;
+            var pwd = result.pwd;
+            var userType = result.userType;
+            var go = result.go;
+            var supUrl = result.supUrl;
+            var validTime = result.validTime;
+            window.location.href = supUrl + "/loginSe.jsp?u=" + uname + "&p=" + pass + "&pwd=" + pwd + "&v=" + validTime + "&userType=" + userType + "&goUrl=" + go;
+
+        }
+    }
+
+
+    $(function () {
+        $("#showLogin").bind("keydown", function (e) {
+            // 兼容FF和IE和Opera
+            var theEvent = e || window.event;
+            var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
+            if (code == 13) {
+                //回车执行查询
+                $("#loginbtn1").click();
+            }
+        });
+    })
+
+</script>
+<script type="text/javascript">
+    var isLoginStatus = false;//全局变量判断登录状态
+    function loginOk() {
+        isLoginStatus = true;
+        $("#loginNo").animate({height: 'hide'});
+        $("#showLogin").animate({height: 'hide'});
+        setTimeout(function () {
+            $("#loginOk").animate({height: 'show'});
+        }, 600);
+    }
+    function logoutOk() {
+        $("#loginNo").animate({height: 'show'});
+        $("#loginOk").animate({height: 'hide'});
+    }
+
+    function showLogin() {
+        $("#loginNo").animate({height: 'hide'});
+        $("#showLogin").animate({height: 'show'});
+    }
+    function hideLogin() {
+        $("#loginNo").animate({height: 'show'});
+        $("#showLogin").animate({height: 'hide'});
+    }
+</script>
+<div class="cfcpn_register">
+    <div class="container">
+        <!-- 未登陆状态 -->
+        <div id="loginNo" class="row" style="display:block;">
+            <span id="sub_title" class="col-md-11 col-xs-12 ">您与金融客户只差一个“金采网+”</span>
+            <span class="col-md-1 col-xs-12 cfcpn_logged-in_bar">
+            <a href="/register">注册</a> |
+            <a href="javascript:void(0)" onclick="showLogin()">登录</a>
+          </span>
+        </div>
+        <!-- 未登陆状态End -->
+
+        <!-- 已登陆状态 -->
+        <div id="loginOk" class="row" style="display:none;">
+            <span id="sub_title1" class="col-md-8 col-xs-12 sub_title">您与金融客户只差一个“金采网+”</span>
+            <span class="col-md-4 cfcpn_logged-in_bar">
+                欢迎您，<a href="javascript:void(0)" onclick="toSup()"><span id="userCname"></span></a> &nbsp; |&nbsp;
+            <a href="javascript:void(0)" onclick="logout()">退出</a>
+          </span>
+        </div>
+        <!-- 已登陆状态End -->
+    </div>
+
+    <!-- 显示登录输入框 -->
+    <div id="showLogin" class="container" style="display:none;">
+        <div class="row">
+            <div class="col-md-4 col-sm-6 cfcpn_login_input">
+                <div class="input-group">
+                    <span class="input-group-addon glyphicon glyphicon-user" id="sizing-addon1"></span>
+                    <input id="uname" type="text" class="form-control" placeholder="用户名">
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-4 -->
+            <div class="col-md-4 col-sm-6 cfcpn_login_input">
+                <div class="input-group">
+                    <span class="input-group-addon glyphicon glyphicon-lock" id="sizing-addon2"></span>
+                    <input id="upass" type="password" class="form-control" placeholder="密码">
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-4 -->
+            <div class="col-md-4 col-sm-12 cfcpn_login_input">
+                <div class="input-group">
+                <span class="input-group-btn">
+                  <button id="loginbtn1" onclick="sub()" class="btn btn-primary cfcpn_login_btn"
+                          type="button">登录</button>
+                </span>
+                    <span class="cfcpn_login_register">
+                      <a href="javascript:void(0)" onclick="hideLogin()" style="color: #fd9f3e">取消</a>
+                    </span>
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-4 -->
+        </div><!-- /.row -->
+    </div>
+    <!-- 显示登录输入框End -->
+</div>
+
+<!-- 欢迎注册End -->
+
+<div class="clearfix"></div>
+
+<!-- 公告详情 -->
+<div class="container-fluid cfcpn_container_list-bg">
+
+    <div class="container">
+        <!-- 面包屑导航 -->
+        <span class="hidden-print">位置：</span>
+        <ol class="hidden-print breadcrumb cfcpn_news_breadcrumb">
+                        <li><a href="/">首页</a></li>
+            <li><a href=/plist/caigou>采供公告</a></li>
+            <li class="active">详情</li>
+        </ol>
+        <!-- 面包屑导航End -->
+
+        <div class="clearfix"></div>
+
+        <!-- 公告内容 -->
+        <div class="row">
+            <div class="col-lg-9 cfcpn_news_mian">
+
+
+                <div id="news_head">
+                    <p class="cfcpn_news_title">交通银行湖州分行长兴支行新营业场所监控安防建设项目(采购公告)</p>
+                    <p class="cfcpn_news_date">发布时间：2019-01-16 14:08:17</p>
+                    <div class="hidden-print cfcpn_news_step">
+                        <div class="col-lg-3 col-sm-3">
+                            <p class="glyphicon glyphicon-user cfcpn_news_step-icon"></p>
+                            <p style="margin-bottom:0px;">采购人</p>
+                            <p>交通银行浙江分行</p>
+                        </div>
+                        <div class="col-lg-3 col-sm-3 col-xs-6">
+                            <p class="glyphicon glyphicon-shopping-cart cfcpn_news_step-icon"></p>
+                            <p style="margin-bottom:0px;">采购方式</p>
+                            <p>公开招标</p>
+                        </div>
+                        <div class="col-lg-3 col-sm-3 col-xs-6">
+                            <p class="glyphicon glyphicon-map-marker cfcpn_news_step-icon"></p>
+                            <p style="margin-bottom:0px;">所在地区</p>
+                            <p>浙江省 湖州市 </p>
+                        </div>
+                        <div class="col-lg-3 col-sm-3 col-xs-6">
+                            <p class="glyphicon glyphicon-cutlery cfcpn_news_step-icon"></p>
+                            <p style="margin-bottom:0px;">品类</p>
+                            <p>工程 装修及配套工程 </p>
+                        </div>
+                    </div>
+                    <br>
+                    <p align="center">
+                                            </p>
+
+
+                </div>
+
+                <!--详细内容Startt-->
+                <div id="news_content">
+                    <p id="infoText" class=" text-left" style="line-height:200%;">
+
+                    <div class="notice">
+                        <div class="notice_describe">
+                            <b>
+                                <p style="text-indent: 28px;line-height: 27px"><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">根据《中华人民共和国政府采购法》等有关规定，现对交通银行湖州分行</span></span><span style=";font-family:宋体;font-size:15px"><span style="font-family:宋体">长兴支行新营业场所监控安防建设</span></span><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">项目组织采购公开招标，欢迎国内符合条件的投标人前来投标。</span></span></p><p style="text-indent:28px;line-height:27px"><strong><span style="font-family: 宋体;font-size: 14px"><span style="font-family:宋体">一、采购编号</span></span></strong><span style=";font-family:宋体;font-size:14px">2019-HZJH-0101</span></p><p style="text-indent:28px;line-height:27px"><strong><span style="font-family: 宋体;font-size: 14px"><span style="font-family:宋体">二、项目名称：</span></span></strong><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">交通银行湖州分行</span></span><span style=";font-family:宋体;font-size:15px"><span style="font-family:宋体">长兴支行新营业场所监控安防建设</span></span><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">项目</span></span></p><p style="text-indent:28px;line-height:27px"><strong><span style="font-family: 宋体;font-size: 14px"><span style="font-family:宋体">三、采购方式：</span></span></strong><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">公开招标</span></span></p><p style="text-indent:28px;line-height:27px"><strong><span style="font-family: 宋体;font-size: 14px"><span style="font-family:宋体">四、招标项目概况（内容、用途、数量、简要技术要求等）：</span></span></strong></p><table cellspacing="0" width="531" style="width: 414px;"><tbody><tr class="firstRow"><td width="49" valign="center" style="padding: 0px 7px; border-width: 1px; border-color: rgb(0, 0, 0);"><p style="text-align:center"><strong><span style="font-family: 宋体;font-size: 14px">序号</span></strong></p></td><td width="161" valign="center" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: rgb(0, 0, 0); border-top-width: 1px; border-top-color: rgb(0, 0, 0); border-bottom-width: 1px; border-bottom-color: rgb(0, 0, 0);"><p style="text-align:center"><strong><span style="font-family: 宋体;font-size: 14px">项目名称</span></strong></p></td><td width="76" valign="center" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: rgb(0, 0, 0); border-top-width: 1px; border-top-color: rgb(0, 0, 0); border-bottom-width: 1px; border-bottom-color: rgb(0, 0, 0);"><p style="text-align:center"><strong><span style="font-family: 宋体;font-size: 14px">采购数量</span></strong></p></td><td width="57" valign="center" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: rgb(0, 0, 0); border-top-width: 1px; border-top-color: rgb(0, 0, 0); border-bottom-width: 1px; border-bottom-color: rgb(0, 0, 0);"><p style="text-align:center"><strong><span style="font-family: 宋体;font-size: 14px">单位</span></strong></p></td><td width="142" valign="center" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: rgb(0, 0, 0); border-top-width: 1px; border-top-color: rgb(0, 0, 0); border-bottom-width: 1px; border-bottom-color: rgb(0, 0, 0);"><p style="text-align:center"><strong><span style="font-family: 宋体;font-size: 14px">简要技术要求、用途</span></strong></p></td><td width="47" valign="center" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: rgb(0, 0, 0); border-top-width: 1px; border-top-color: rgb(0, 0, 0); border-bottom-width: 1px; border-bottom-color: rgb(0, 0, 0);"><p style="text-align:center"><strong><span style="font-family: 宋体;font-size: 14px">备注</span></strong></p></td></tr><tr><td width="49" valign="center" style="padding: 0px 7px; border-left-width: 1px; border-left-color: rgb(0, 0, 0); border-right-width: 1px; border-right-color: rgb(0, 0, 0); border-top: none; border-bottom-width: 1px; border-bottom-color: rgb(0, 0, 0);"><p style=";text-align:center"><span style="font-family:宋体;font-size:14px">1</span></p></td><td width="161" valign="center" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: rgb(0, 0, 0); border-top: none; border-bottom-width: 1px; border-bottom-color: rgb(0, 0, 0);"><p style=";text-align:center"><span style=";font-family:宋体;font-size:14px">交通银行湖州分行长兴支行新营业场所监控安防建设项目</span></p></td><td width="76" valign="center" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: rgb(0, 0, 0); border-top: none; border-bottom-width: 1px; border-bottom-color: rgb(0, 0, 0);"><p style=";text-align:center"><span style="font-family:宋体;font-size:14px">1</span></p></td><td width="57" valign="center" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: rgb(0, 0, 0); border-top: none; border-bottom-width: 1px; border-bottom-color: rgb(0, 0, 0);"><p style=";text-align:center"><span style="font-family:宋体;font-size:14px">批</span></p></td><td width="142" valign="center" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: rgb(0, 0, 0); border-top: none; border-bottom-width: 1px; border-bottom-color: rgb(0, 0, 0);"><p><span style=";font-family:宋体;font-size:14px">具体要求详见采购文件。</span></p></td><td width="47" valign="center" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: rgb(0, 0, 0); border-top: none; border-bottom-width: 1px; border-bottom-color: rgb(0, 0, 0);"><br/></td></tr></tbody></table><p style=";line-height:27px"><strong><span style="font-family: 宋体;font-size: 14px">&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-family:宋体">五、投标供应商资格要求：</span></span></strong></p><p style="text-indent: 28px;line-height: 25px"><span style=";font-family:宋体;font-size:14px">1、具有独立法人资格。 &nbsp; &nbsp;</span></p><p style="text-indent: 28px;line-height: 25px"><span style=";font-family:宋体;font-size:14px">2、须在法律和财务上独立，具有健全的财务会计制度和公司治理措施，合法运作，商业信誉良好。</span></p><p style="text-indent: 28px;line-height: 25px"><span style=";font-family:宋体;font-size:14px">3、应遵守有关的中国法律和法规。不存在环境污染、非法用工等引发环境和社会风险的违法违规行为。</span></p><p style="text-indent: 28px;line-height: 25px"><span style=";font-family:宋体;font-size:14px">4、存在关联关系的不同供应商，不得同时参加本项目。关联关系企业包含以下情况：</span></p><p style="text-indent: 28px;line-height: 25px"><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">与本企业单位负责人为同一人的其他企业；</span></span></p><p style="text-indent: 28px;line-height: 25px"><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">与本企业存在直接控股、管理关系的其他企业。</span></span></p><p style="text-indent: 28px;line-height: 25px"><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">投标人应向采购人如实披露与本单位存在关联关系的其他企业。采购人有权取消关联关系企业参与该项目的资格。</span></span></p><p style="text-indent: 28px;line-height: 25px"><span style=";font-family:宋体;font-size:14px">5、项目不接受联合体投标。</span></p><p style="text-indent: 28px;line-height: 25px"><span style=";font-family:宋体;font-size:14px">6、不得将本项目采购内容以任何方式进行转包。</span></p><p style="text-indent:28px"><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">投标供应商特殊要求：</span></span></p><p style="text-indent:28px"><span style=";font-family:宋体;font-size:14px">7、</span><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">具备电子与智能化工程专业承包贰级或设计与施工企业建筑智能化工程贰级及以上资质；</span></span></p><p><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">同时具备安全技术防范行业协会或公安部门颁发的</span>“安防工程企业壹级”资质证书；</span></p><p style="text-indent: 28px;line-height: 25px"><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">建造师（项目经理）：具备机电工程贰级及以上资质。</span></span></p><p style="text-indent:28px;line-height:27px"><strong><span style="font-family: 宋体;font-size: 14px"><span style="font-family:宋体">六、供应商报名时间及地点等：</span></span></strong></p><p style="text-indent: 28px;line-height: 25px"><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">采购文件发售时间：</span>2019-01-16至2019-01-25（双休日及法定节假日除外）</span></p><p style="text-indent: 28px;line-height: 25px"><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">上午：</span>9:00至12:00 下午：14:00至17:00</span></p><p style="text-indent: 28px;line-height: 25px"><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">地点：湖州市人民路</span>299号516办公室</span></p><p style="text-indent: 28px;line-height: 25px"><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">供应商报名方式：现场报名</span></span></p><p style="text-indent: 28px;line-height: 25px"><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">获取标书时须提交的文件资料：</span></span></p><p style="text-indent: 28px;line-height: 25px"><span style=";font-family:宋体;font-size:14px">&nbsp;1）企业营业执照复印件（盖公章）；2）单位介绍信或法定代表人授权委托书原件；3）授权代表身份证复印件（原件查验）；4）资质证书复印件加盖公章；5）“</span><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">安防工程企业壹级</span>”资质证书复印件加盖公章；</span><span style=";font-family:宋体;font-size:14px">6）增值税发票开票资料（含单位名称、税号（统一社会信用代码）、开户行名称、账号、地址及联系电话、增值税一般纳税人证明）。</span></p><p style="text-indent: 28px;line-height: 25px"><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">提示：</span></span></p><p style="text-indent: 28px;line-height: 25px"><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">（</span>1）招标单位将拒绝接受非报名供应商的投标文件。</span></p><p style="text-indent: 28px;line-height: 25px"><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">（</span>2）招标文件领取截止时间之后有潜在供应商提出要求获取招标文件的，采购机构将允许其获取，但该供应商如对招标文件有异议的，应于自招标文件领取截止时间之日起七个工作日内以书面形式向采购机构提出。</span></p><p style="text-indent:28px;line-height:27px"><strong><span style="font-family: 宋体;font-size: 14px"><span style="font-family:宋体">七、投标截止时间：</span></span></strong><span style=";font-family:宋体;font-size:14px">2019年 2 月19日14时00分</span></p><p style="text-indent:28px;line-height:27px"><strong><span style="font-family: 宋体;font-size: 14px"><span style="font-family:宋体">八、投标地点：</span></span></strong><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">湖州市人民路</span>299号交通银行湖州分行516会议室</span></p><p style="text-indent:28px;line-height:27px"><strong><span style="font-family: 宋体;font-size: 14px"><span style="font-family:宋体">九、开标时间：</span></span></strong><span style=";font-family:宋体;font-size:14px">2019年 2 月19日14时30分</span></p><p style="text-indent:28px;line-height:27px"><strong><span style="font-family: 宋体;font-size: 14px"><span style="font-family:宋体">十、开标地点：</span></span></strong><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">湖州市人民路</span>299号交通银行湖州分行404会议室</span></p><p style="text-indent:28px;line-height:150%"><strong><span style="font-family: 宋体;font-size: 14px"><span style="font-family:宋体">十二、质疑和投诉：</span></span></strong></p><p style="text-indent: 28px;line-height: 150%"><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">供应商认为招标文件、采购过程和中标、成交结果使自己的权益受到损害的，可以在知道或者应知其权益受到损害之日起七个工作日内，以书面形式向采购机构提出质疑。供应商对采购机构的质疑答复不满意或者采购机构未在规定时间内作出答复的，可以在答复期满后十五个工作日内向采购人监管部门（湖州分行集中采购中心）投诉。</span></span></p><p style="text-indent:28px;line-height:150%"><strong><span style="font-family: 宋体;font-size: 14px"><span style="font-family:宋体">十三、其他事项</span></span></strong></p><p style="text-indent: 28px;line-height: 150%;background: rgb(255, 255, 255)"><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">（</span>1）本项目不接受联合体投标，不允许有任何形式的分包。</span></p><p style="text-indent: 28px;line-height: 150%"><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">（</span>2）本项目资格审查方式：资格后审。</span></p><p style="text-indent: 28px;line-height: 150%"><span style=";font-family:宋体;font-size:14px">1、采购</span><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">人：</span></span><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">交通银行股份有限公司湖州分行</span></span></p><p style="text-indent: 28px;line-height: 25px"><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">地址：湖州市人民路</span>299号 &nbsp;&nbsp;&nbsp;联系人：</span><span style=";font-family:宋体;font-size:14px"><span style="font-family:宋体">赖锋永</span> &nbsp;0572-</span><span style=";font-family:宋体;font-size:14px">202083</span></p><p style="text-indent: 28px; line-height: 25px;"><span style="text-indent: 284px;"><span style="font-family: 宋体; font-size: 14px;">&nbsp;</span></span></p><p style="text-indent: 28px; line-height: 25px;"><span style="text-indent: 284px;"><span style="font-family: 宋体; font-size: 14px;"><b><br/></b></span></span></p><p style="text-indent: 28px; line-height: 25px;"><span style="text-indent: 284px;"><span style="font-family: 宋体; font-size: 14px;"><b>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;交</b></span></span><span style="text-indent: 284px; font-family: 宋体; font-size: 14px;">通银行股份有限公司湖州分行集中采购中心</span></p><p style="margin-right:28px;text-indent:28px;text-align:center;line-height:150%"><span style=";font-family:宋体;font-size:14px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2019年1月16日</span></p><p><br/></p>
+                            </b>
+                        </div>
+                        <div class="notice_message">
+                            <p>采购人：交通银行浙江分行</p>
+                        </div>
+                    </div>
+
+
+
+
+                    </p>
+
+
+                </div>
+                <!--详细内容End-->
+
+
+            </div>
+
+            <!-- 侧边栏 -->
+            <div class="hidden-print col-lg-3 text-center cfcpn_news_sidebar">
+                <img src="/webPage/assets/images_plat/cont_ad02.jpg" class="img-responsive center-block">
+                <a href="#" target="_blank"><img src="/webPage/assets/images_plat/cont_ad03.jpg"
+                                                 class="img-responsive center-block" alt="广告位290*350"></a>
+                <a href="#" target="_blank"><img src="/webPage/assets/images_plat/cont_ad04.jpg"
+                                                 class="img-responsive center-block" alt="广告位290*350"></a>
+            </div>
+            <!-- 侧边栏End -->
+        </div>
+        <!-- 公告内容End -->
+
+    </div>
+
+</div>
+<!-- 公告详情End -->
+
+<div class="clearfix"></div>
+
+
+<!-- 页脚 -->
+<footer>
+    <div class="container-fluid text-center cfcpn_footer cfcpn_line_height100">
+        <p>Copyright©2008　中国金融集中采购网版权所有　京ICP备11024531号-1　京ICP证100491号</p>
+        <p>北京市西城区佟麟阁路95号尚信大厦12层</p>
+    </div>
+</footer>
+
+</body>
+</html>
